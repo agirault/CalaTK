@@ -1,0 +1,7 @@
+- Allow for independent metrics for every measurement point in CObjectiveFunction (this will allow for example to do registration based formulations, which can strore intermediate values whenever they are called). But also allow just to specify one which is then used for all datapoints
+- Add a virtual member function for metric gradient (with respect to image, because we work with the adjoint formulations here)
+- Implement command line and config file parsing
+- Implement kernel factory
+- Add concept checking to make sure the classes are only instantiated for appropriate states and floating point types.
+
+- Check that all the cellwise multiplications and such properly deal with vector-valued images.

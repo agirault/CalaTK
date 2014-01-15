@@ -1,0 +1,49 @@
+
+{
+	"Inputs" :
+	{
+		"subject1" :
+		[
+
+			[
+				0.0,
+				"Bullseye2DTimePoint0.mha"
+			],
+
+			[
+				1.0,
+				"Bullseye2DTimePoint1.mha"
+			]
+		]
+	},
+	"Outputs" :
+	{
+		"subject1" :
+		[
+			[
+				0.00,
+				"Bullseye2DTime0.00Warped.mha"
+			],
+			[
+				0.20,
+				"Bullseye2DTime0.20Warped.mha"
+			],
+			[
+				0.40,
+				"Bullseye2DTime0.40Warped.mha"
+			],
+			[
+				0.60,
+				"Bullseye2DTime0.60Warped.mha"
+			],
+			[
+				0.80,
+				"Bullseye2DTime0.80Warped.mha"
+			],
+			[
+				1.00,
+				"Bullseye2DTime1.00Warped.mha"
+			]
+		]
+	}
+}

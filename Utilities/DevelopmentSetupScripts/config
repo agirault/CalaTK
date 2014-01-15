@@ -1,0 +1,26 @@
+# Kitware Local Git Setup Scripts - Sample Project Configuration
+#
+# Copy to "config" and edit as necessary.
+
+[hooks]
+	url = http://itk.org/ITK.git
+	branch = hooks
+
+[ssh]
+	host = www.calatk.org
+	key = id_git_calatk
+	request-url = https://www.kitware.com/Admin/SendPassword.cgi
+        pushurl = git@www.calatk.org:calatk.git
+
+# We don't use this at this time.
+[stage]
+	#url = git://public.kitware.com/stage/Project.git
+	#pushurl = git@public.kitware.com:stage/Project.git
+        cmd = ssh git@public.kitware.com stage Project
+
+[gerrit]
+	project = calatk
+	site = http://review.source.kitware.com
+	# pushurl placeholder "$username" is literal
+	pushurl = $username@review.source.kitware.com:calatk
+        pushcmd = bash Utilities/Git/git-gerrit-push

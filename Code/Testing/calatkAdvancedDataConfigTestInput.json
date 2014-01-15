@@ -1,0 +1,50 @@
+{
+"CalaTKDataConfigurationVersion": 1.0,
+
+"Inputs":
+{
+  "Subjects":
+  [
+  { "ID": "John",
+    "TimePoints":
+    [
+    { "Time": 0.0, "Image": "ultrasound1.mha", "Transform": "ultrasound1_transform.hdf" },
+    { "Time": 0.2, "Image": "ultrasound2.mha", "Transform": "ultrasound2_transform.hdf" },
+    { "Time": 0.9, "Image": "ultrasound3.mha", "Transform": "ultrasound3_transform.hdf" }
+    ]
+  },
+  { "ID": "Alice",
+    "TimePoints":
+    [
+    { "Time": 0.0, "Image": "mri_a.dcm", "Transform": "mri_a_transform.hdf" },
+    { "Time": 2.2, "Image": "mri_b.dcm", "Transform": "mri_b_transform.hdf" },
+    { "Time": 3.7, "Image": "mri_c.dcm", "Transform": "mri_c_transform.hdf" },
+    { "Time": 7.7, "Image": "mri_d.dcm", "Transform": "mri_d_transform.hdf" }
+    ]
+  }
+  ]
+},
+
+"Outputs":
+{
+  "Subjects":
+  [
+  { "ID": "John",
+    "TimePoints":
+    [
+    { "Time": 0.2, "Image": "ultrasound_warped2.mha" },
+    { "Time": 0.7, "Image": "ultrasound_warped3.mha" }
+    ]
+  },
+  { "ID": "Alice",
+    "TimePoints":
+    [
+    { "Time": 0.0, "Image": "mri_warped_a.dcm", "Transform": "mri_warped_a_transform.hdf" },
+    { "Time": 3.3, "Image": "mri_warped_c.dcm", "Transform": "mri_warped_c_transform.hdf" },
+    { "Time": 7.7, "Image": "mri_warped_d.dcm", "Transform": "mri_warped_d_transform.hdf" }
+    ]
+  }
+  ]
+},
+"Some other stuff": "This should not show up in the cleaned configuration."
+}
