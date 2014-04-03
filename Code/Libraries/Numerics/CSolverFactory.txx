@@ -40,6 +40,9 @@ CSolverFactory< TState >::CreateNewSolver( NumericSolverType solver )
   case LineSearchConstrained:
     ptrSolver = new SolverLineSearchConstrainedType;
     break;
+  case LineSearchUnconstrained:
+      ptrSolver = new SolverLineSearchUnconstrainedType;
+      break;
   case IpOpt:
 #ifdef USE_IPOPT
     ptrSolver = new SolverIpOptType;
@@ -65,9 +68,9 @@ CSolverFactory< TState >::CreateNewSolver( NumericSolverType solver )
 #endif
     break;
   default:
-    std::cout << "Unknown solver type = " << solver << "; defaulting to LineSearchUnconstrained." << std::endl;
-  case LineSearchUnconstrained:
-    ptrSolver = new SolverLineSearchUnconstrainedType;
+    std::cout << "Unknown solver type = " << solver << "; defaulting to SolverStepLengthSelection." << std::endl;
+  case StepLengthSelection:
+    ptrSolver = new SolverStepLengthSelection;
     break;
   }
 
@@ -90,7 +93,11 @@ CSolverFactory< TState >::GetSolverTypeFromString( std::string sSolver )
   // convert to all lower case
   std::transform( sSolverLowerCase.begin(), sSolverLowerCase.end(), sSolverLowerCase.begin(), ::tolower );
 
-  if ( sSolverLowerCase == "linesearchunconstrained" )
+  if ( sSolverLowerCase == "steplengthselection" )
+  {
+    return StepLengthSelection;
+  }
+  else if ( sSolverLowerCase == "linesearchunconstrained" )
   {
     return LineSearchUnconstrained;
   }
@@ -112,8 +119,8 @@ CSolverFactory< TState >::GetSolverTypeFromString( std::string sSolver )
   }
   else
   {
-    std::cout << "Unknown solver type " << sSolver << "; defaulting to LineSearchUnconstrained." << std::endl;
-    return LineSearchUnconstrained;
+    std::cout << "Unknown solver type " << sSolver << "; defaulting to StepLengthSelection." << std::endl;
+    return StepLengthSelection;
   }
 }
 
