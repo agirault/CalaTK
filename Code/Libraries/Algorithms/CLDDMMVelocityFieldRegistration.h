@@ -31,6 +31,7 @@
 #include "CAlgorithm.h"
 #include "CImageManager.h"
 #include "CSolverLineSearchUnconstrained.h"
+#include "CSolverStepLengthSelection.h"
 #include "CSolverMultiScale.h"
 
 namespace CALATK

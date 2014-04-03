@@ -22,7 +22,7 @@
 
 template < class TState >
 CSolverMultiScale< TState >::CSolverMultiScale()
-  : DefaultSingleScaleSolver( "LineSearchUnconstrained" ),
+  : DefaultSingleScaleSolver( "StepLengthSelection" ),
     m_ExternallySetSingleScaleSolver( false ),
     DefaultNumberOfSubIterations( 1 ),
     m_ExternallySetNumberOfSubIterations( false )
