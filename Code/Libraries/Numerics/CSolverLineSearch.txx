@@ -223,7 +223,6 @@ bool CSolverLineSearch< TState>::LineSearchWithBacktracking( CEnergyValues Curre
     *pState = *pTempState;
     ResultingEnergy = InitialEnergy;
     return false;
-
     }
   else
     {
