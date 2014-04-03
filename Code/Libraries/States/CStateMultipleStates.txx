@@ -181,7 +181,7 @@ CStateMultipleStates< TState >::operator-=(const CStateMultipleStates & p )
   if ( m_IndividualStatesCollection.size() != p.m_IndividualStatesCollection.size() )
     {
     throw std::runtime_error( "Size mismatch of vector of vector fields. ABORT." );
-    return;
+    //return;
     }
 
   typename IndividualStatesCollectionType::const_iterator iterSource;
