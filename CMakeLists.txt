@@ -111,7 +111,7 @@ endif()
 if(WIN32)
   set(BUILD_SHARED_LIBS OFF)
 endif()
-
+  set(BUILD_SHARED_LIBS OFF)
 #
 # Configure calatkConfigure.h.in
 #
