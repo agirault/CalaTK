@@ -3,7 +3,7 @@ include( ExternalProject )
 set( base "${CMAKE_BINARY_DIR}" )
 set_property( DIRECTORY PROPERTY EP_BASE ${base} )
 
-set( shared ON )
+set( shared OFF )
 set( testing ON )
 set( build_type "Debug" )
 if( CMAKE_BUILD_TYPE )
@@ -55,7 +55,7 @@ set ( COMMON_PROJECT_COMPILER_FLAGS
   set( proj ITK )
   ExternalProject_Add( ${proj}
     GIT_REPOSITORY "${GIT_PROTOCOL}://itk.org/ITK.git"
-    GIT_TAG "v4.3.1"
+    GIT_TAG "v4.4.1"
     SOURCE_DIR "${CMAKE_BINARY_DIR}/ITK"
     BINARY_DIR ITK-Build
     CMAKE_GENERATOR ${gen}
@@ -64,14 +64,31 @@ set ( COMMON_PROJECT_COMPILER_FLAGS
       -DBUILD_SHARED_LIBS:BOOL=${shared}
       -DBUILD_EXAMPLES:BOOL=OFF
       -DBUILD_TESTING:BOOL=OFF
+
       -DUSE_FFTWF:BOOL=ON
       -DUSE_FFTWD:BOOL=ON
       -DUSE_SYSTEM_FFTW:BOOL=OFF
-      -DITKGroup_IO:BOOL=ON
-      -DITKGroup_Filtering:BOOL=ON
-      -DITKGroup_Nonunit:BOOL=ON
-      -DITK_BUILD_ALL_MODULES:BOOL=OFF
-      -DModule_ITKTestKernel:BOOL=ON
+
+      -DITK_BUILD_DEFAULT_MODULES:BOOL=OFF
+      -DITKGroup_Core:BOOL=OFF
+      -DITKGroup_Filtering:BOOL=OFF
+      -DITKGroup_Nonunit:BOOL=OFF
+      -DITKGroup_IO:BOOL=OFF
+      -DITKGroup_Video:BOOL=OFF
+      -DITKGroup_Segmentation:BOOL=OFF
+      -DITKGroup_Registration:BOOL=OFF
+      -DITKGroup_Numerics:BOOL=OFF
+      -DITKGroup_Compatibility:BOOL=OFF
+      -DITKGroup_Bridge:BOOL=OFF
+      -DITKGroup_ThirdParty:BOOL=OFF
+
+      -DModule_ITKTestKernel:BOOL=ON #Core
+      -DModule_ITKTransform:BOOL=ON #Core
+      -DModule_ITKImageFunction:BOOL=ON #Core
+      -DModule_ITKImageGrid:BOOL=ON #Filtering
+      -DModule_ITKIOTransformBase:BOOL=ON #IO
+
+
     INSTALL_COMMAND ""
     )
   set( ITK_DIR "${base}/ITK-Build" )
@@ -88,7 +105,7 @@ endif()
 set( proj ImageViewer )
 ExternalProject_Add( ImageViewer
   GIT_REPOSITORY "${GIT_PROTOCOL}://github.com/TubeTK/ImageViewer.git"
-  GIT_TAG "6eb0857000fa09d9fc7c452100c46da9ee31d4a1"
+  GIT_TAG "5e20586417e6681d4c44cc6bcc61f4b35b9888da"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/ImageViewer"
   BINARY_DIR ImageViewer-Build
   CMAKE_GENERATOR ${gen}

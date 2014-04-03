@@ -16,6 +16,8 @@ if(ModuleDescriptionParser_USE_PYTHON)
   find_package(PythonLibs)
 endif(ModuleDescriptionParser_USE_PYTHON)
 
+message ("test" ${BUILD_SHARED_LIBS})
+
 if(NOT DEFINED BUILD_SHARED_LIBS)
   option(BUILD_SHARED_LIBS "Build with shared libraries." ON)
 endif(NOT DEFINED BUILD_SHARED_LIBS)
