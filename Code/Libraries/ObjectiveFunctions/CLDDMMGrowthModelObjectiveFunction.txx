@@ -444,7 +444,7 @@ CLDDMMGrowthModelObjectiveFunction< TState >::GetCurrentEnergy()
   energyValues.dRegularizationEnergy = dVelocitySquareNorm;
   energyValues.dMatchingEnergy = dImageNorm;
 
-  std::cout << "E(I) = " << dImageNorm << std::endl;
+  //std::cout << "E(I) = " << dImageNorm << std::endl;
 
   return energyValues;
 
