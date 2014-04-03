@@ -278,6 +278,13 @@ int main(int argc, char **argv)
     uiImageDimension = (unsigned int)iDimension;
   }
 
+
+  std::cout<<sourceToTargetMap<<std::endl;
+  size_t found=sourceToTargetMap.find_last_of("/\\");
+  std::string energyFilepath = sourceToTargetMap.substr(0,found) + "/RegEnergy.txt";
+  std::cout<<energyFilepath<<std::endl;
+
+
 #ifdef FLOATING_POINT_CHOICE
   DoItNDWithType( sFloatingPointType, uiImageDimension, argc, argv );
 #else

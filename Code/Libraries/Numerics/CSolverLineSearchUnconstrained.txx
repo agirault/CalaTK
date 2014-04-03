@@ -32,61 +32,53 @@ CSolverLineSearchUnconstrained< TState >::CSolverLineSearchUnconstrained()
 template < class TState >
 bool CSolverLineSearchUnconstrained< TState >::SolvePreInitialized()
 {
+
+    std::cout << "[Unconstrained linesearch] Max iterations = " << this->m_MaxNumberOfIterations<< std::endl;
+
   ObjectiveFunctionType * objectiveFunction = this->GetObjectiveFunction();
 
   unsigned int uiNrOfIterationsWithImmediateDecrease = 0;
   unsigned int uiNrOfIterationsWithoutImmediateDecrease = 0;
 
+  //* Linesearch Inputs *//
+  // Energy
   CEnergyValues InitialEnergy = objectiveFunction->GetCurrentEnergy();
   std::cout << "Initial energy = " << InitialEnergy.dEnergy << std::endl;
-
+  CEnergyValues CurrentEnergy = InitialEnergy;
+  // Step Size
   T dDesiredStepSize = this->m_InitialStepSize;
-  T dAlpha;
-  CEnergyValues ResultingEnergy;
-
-  // creating new temp state
+  // New temp state
   this->m_TempState = new TState( *objectiveFunction->GetStatePointer() );
 
-  std::string sStatePrefix = "S" + CreateIntegerString( (int)this->GetExternalSolverState() ) + "-";
+  // Output the initial state if desired
+  //std::string sStatePrefix = "S" + CreateIntegerString( (int)this->GetExternalSolverState() ) + "-";
+  //this->OutputStateInformation( 0, sStatePrefix );
 
-  // output the initial state if desired
-  this->OutputStateInformation( 0, sStatePrefix );
-
-  CEnergyValues CurrentEnergy = InitialEnergy;
-
-  std::cout << "Unconstrained linesearch: requested at most " << this->m_MaxNumberOfIterations << " iterations." << std::endl;
+  // Linesearch Outputs
+  T dAlpha;
+  CEnergyValues ResultingEnergy;
+  unsigned int uiRequiredIterations;
 
   for ( unsigned int uiIter = 0; uiIter < this->m_MaxNumberOfIterations; ++uiIter )
     {
 
-    unsigned int uiRequiredIterations;
+    std::cout << std::endl << ">> ITERATION " << uiIter+1 << std::endl;
     bool bSufficientlyDecreasedEnergy = this->LineSearchWithBacktracking( CurrentEnergy, dDesiredStepSize, dAlpha, ResultingEnergy, uiRequiredIterations, this->m_TempState );
 
+    // Output the current energy information //std::setw(10)
+    std::cout << "reqIter =  " << uiRequiredIterations << std::endl;
+    std::cout << "Alpha   =  " << dAlpha << std::endl;
+    std::cout << "E(tot)  =  " << ResultingEnergy.dEnergy << std::endl;
+    std::cout << "E(I)    =  " << ResultingEnergy.dMatchingEnergy << std::endl;
+    std::cout << "E(v)    =  " << ResultingEnergy.dRegularizationEnergy << std::endl;
+
+    //Output the state if desired
+    //this->OutputStateInformation( uiIter + 1, sStatePrefix );
+
     if ( bSufficientlyDecreasedEnergy )
       {
+
         CurrentEnergy = ResultingEnergy;
-      }
-
-    // output the current energy information
-
-    std::cout << "I " << std::setw(5) << uiIter << "; ";
-    std::cout << "alpha = " << std::setw(10) << dAlpha << "; ";
-    std::cout << "E(tot) = " << std::setw(10) << ResultingEnergy.dEnergy << "; ";
-    std::cout << "E(I) = " << std::setw(10) << ResultingEnergy.dMatchingEnergy << "; ";
-    std::cout << "E(v) = " << std::setw(10) << ResultingEnergy.dRegularizationEnergy << "; ";
-    std::cout << "reqIter = " << std::setw(2) << uiRequiredIterations;
-
-    if ( !bSufficientlyDecreasedEnergy )
-      std::cout << "!";
-
-    std::cout << std::endl;
-
-
-    // output the state if desired
-    this->OutputStateInformation( uiIter + 1, sStatePrefix );
-
-    if ( bSufficientlyDecreasedEnergy )
-      {
 
       if ( dDesiredStepSize == dAlpha ) // could be decreased immediately
         {
@@ -136,8 +128,13 @@ bool CSolverLineSearchUnconstrained< TState >::SolvePreInitialized()
       }
     }
 
-  // clean up
+  // write RegularizationEnergy
+    std::ofstream file;
+    file.open ("RegEnergy.txt");
+    file <<ResultingEnergy.dRegularizationEnergy;
+    file.close();
 
+  // clean up
   if ( ResultingEnergy.dEnergy < InitialEnergy.dEnergy )
     {
     // could reduce the energy
