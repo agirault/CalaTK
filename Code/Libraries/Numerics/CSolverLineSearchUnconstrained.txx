@@ -35,6 +35,9 @@ bool CSolverLineSearchUnconstrained< TState >::SolvePreInitialized()
 
     std::cout << "[Unconstrained linesearch] Max iterations = " << this->m_MaxNumberOfIterations<< std::endl;
 
+    unsigned int cpt_f = 0;
+    unsigned int cpt_g = 0;
+
   ObjectiveFunctionType * objectiveFunction = this->GetObjectiveFunction();
 
   unsigned int uiNrOfIterationsWithImmediateDecrease = 0;
@@ -42,7 +45,7 @@ bool CSolverLineSearchUnconstrained< TState >::SolvePreInitialized()
 
   //* Linesearch Inputs *//
   // Energy
-  CEnergyValues InitialEnergy = objectiveFunction->GetCurrentEnergy();
+  CEnergyValues InitialEnergy = objectiveFunction->GetCurrentEnergy(); cpt_f++;
   std::cout << "Initial energy = " << InitialEnergy.dEnergy << std::endl;
   CEnergyValues CurrentEnergy = InitialEnergy;
   // Step Size
@@ -63,7 +66,102 @@ bool CSolverLineSearchUnconstrained< TState >::SolvePreInitialized()
     {
 
     std::cout << std::endl << ">> ITERATION " << uiIter+1 << std::endl;
-    bool bSufficientlyDecreasedEnergy = this->LineSearchWithBacktracking( CurrentEnergy, dDesiredStepSize, dAlpha, ResultingEnergy, uiRequiredIterations, this->m_TempState );
+    /************************ BIG CHANGEMENT ************************************/
+    //bool bSufficientlyDecreasedEnergy = this->LineSearchWithBacktracking( CurrentEnergy, dDesiredStepSize, dAlpha, ResultingEnergy, uiRequiredIterations, this->m_TempState );
+    bool bSufficientlyDecreasedEnergy;
+
+    // get current energy
+    CEnergyValues InitialEnergy = CurrentEnergy;
+    CEnergyValues ComputedEnergy;
+
+    T dAdjustedEnergy = std::numeric_limits< T >::infinity();
+
+    // save the current state
+    TState* pTempState = this->m_TempState;
+    *pTempState = *objectiveFunction->GetStatePointer();
+
+    // get a pointer to the state (which will be updated throughout the iterations)
+    TState *pState = objectiveFunction->GetStatePointer();
+
+    // compute the current gradient
+    objectiveFunction->ComputeGradient(); cpt_g++;
+
+    // get current gradient
+    TState *pCurrentGradient = objectiveFunction->GetGradientPointer();
+
+    // compute the norm of the gradient (required for line search with gradient descent)
+    T dSquaredNorm = pCurrentGradient->SquaredNorm();
+
+    //std::cout << "dSquaredNorm = " << dSquaredNorm << std::endl;
+
+    // now see if we can reduce the energy by backtracking
+    // FIXME: Add sufficient decrease condition: for now just see if it is decreasing
+
+    dAlpha = dDesiredStepSize;
+
+    bool bHitLowerStepSizeBound = false;
+    bool bTerminate = false;
+    uiRequiredIterations = 0;
+
+    do
+      {
+
+      // if it has reached the smallest allowable step size
+      if ( bHitLowerStepSizeBound ) bTerminate = true;
+
+      // doing the gradient step
+      //*pState = *pTempState - (*pCurrentGradient)*dAlpha;
+      // here comes a more memory efficient version
+      // (should need no new reallocation of memory, but simply overwrites *pState all the time)
+
+      *pState = *pCurrentGradient;
+      *pState *= -dAlpha;
+      *pState += *pTempState;
+
+      // recompute the energy
+
+      ComputedEnergy = objectiveFunction->GetCurrentEnergy(); cpt_f++;
+
+      /*std::cout << "initE = " << dInitialEnergy << std::endl;
+      std::cout << "dc = " << m_DecreaseConstant << std::endl;
+      std::cout << "alpha = " << dAlpha << std::endl;
+      std::cout << "sqNorm = " << dSquaredNorm << std::endl;*/
+
+      dAdjustedEnergy = InitialEnergy.dEnergy - this->m_DecreaseConstant*dAlpha*dSquaredNorm;
+
+      //std::cout << "computed energy = " << dComputedEnergy << "; dAdjustedEnergy = " << dAdjustedEnergy << std::endl;
+      //std::cout << "dComputedEnergy = " << dComputedEnergy << std::endl;
+
+      if ( ComputedEnergy.dEnergy >= dAdjustedEnergy )
+        {
+        dAlpha *= this->m_ReductionFactor;
+        if ( dAlpha < this->m_MinAllowedStepSize )
+          {
+          dAlpha = this->m_MinAllowedStepSize;
+          bHitLowerStepSizeBound = true;
+          }
+        }
+
+      uiRequiredIterations++;
+
+      }
+    while ( ( ComputedEnergy.dEnergy >= dAdjustedEnergy ) && ( uiRequiredIterations <= this->m_MaxNumberOfTries ) && ( !bTerminate ) );
+
+    if ( ComputedEnergy.dEnergy > dAdjustedEnergy )
+      {
+      // could not reduce the energy, so keep the original one
+      *pState = *pTempState;
+      ResultingEnergy = InitialEnergy;
+      bSufficientlyDecreasedEnergy = false;
+      }
+    else
+      {
+      // energy was successfully reduced, we can keep the updated state (in pState)
+      ResultingEnergy = ComputedEnergy;
+      bSufficientlyDecreasedEnergy = true;
+      }
+
+    /************************************************************************************************************/
 
     // Output the current energy information //std::setw(10)
     std::cout << "reqIter =  " << uiRequiredIterations << std::endl;
@@ -133,6 +231,11 @@ bool CSolverLineSearchUnconstrained< TState >::SolvePreInitialized()
     file.open ("RegEnergy.txt");
     file <<ResultingEnergy.dRegularizationEnergy;
     file.close();
+
+    std::cout << std::endl << "[Unconstrained linesearch] End of minimization" << std::endl; // COUT
+    std::cout << "# of Energies comp  =  " << cpt_f << std::endl;
+    std::cout << "# of Gradient comp  =  " << cpt_g << std::endl;
+
 
   // clean up
   if ( ResultingEnergy.dEnergy < InitialEnergy.dEnergy )
