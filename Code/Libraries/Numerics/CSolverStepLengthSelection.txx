@@ -7,8 +7,8 @@
 
 template < class TState >
 CSolverStepLengthSelection< TState>::CSolverStepLengthSelection()
-  : DefaultMinGradAllowed( 0.1 ),
-    DefaultMinDisplacementAllowed( 0.0001 ),
+  : DefaultMinGradAllowed( 0.1 ), //TODO analyze this value
+    DefaultMinDisplacementAllowed( 0.002 ), //TODO and this value (link to resolution/sizing?)
     DefaultDecreaseConstant( 0.0001 ),
     DefaultMaxNumberOfIterations( 100 ),
     DefaultMaxNumberOfTries( 10 ),
@@ -115,9 +115,10 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
         std::cout << std::endl << ">> ITERATION " << it_count << std::endl; // COUT
 
         /* compute alpha0 */
-        if( it_count==1 ) alpha_cur = 100.0/(1.0+g_norm);
-        else alpha_cur = alpha_prev*2;
-        if ( alpha_cur > 1.0 ) alpha_cur = 1.0; // to avoid big steps
+        if (it_count == 1) alpha_cur = 10.0/g_norm;
+        else alpha_cur *=5;
+        if ( alpha_cur > 0.1 ) alpha_cur = 0.1; // to avoid big steps
+        else if ( alpha_cur < 0.00001 ) alpha_cur = 0.00001; // to avoid big steps
 
         std::cout << "Alpha test    =  " << alpha_cur << std::endl; // COUT
 
@@ -131,7 +132,7 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
 
         /* Test Armijo condition (tries) */
         unsigned int it_armijo = 0;
-        while( (f_new > f_cur - m_DecreaseConstant * alpha_cur * g_norm) && (it_armijo < m_MaxNumberOfTries) )
+        while( (f_new > f_cur - m_DecreaseConstant * alpha_cur * g_norm) && (it_armijo < m_MaxNumberOfTries) ) //TODO : is it correct for g_norm?
         {
             it_armijo++;
             std::cout << ">>> TRY " << it_armijo << std::endl; // COUT
@@ -182,13 +183,13 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
         f_cur   = f_new;
         f->ComputeGradient(); cpt_g++;
         g_cur   =  *f->GetGradientPointer();
-        g_norm  = g_cur.SquaredNorm();
+        g_norm  = g_cur.SquaredNorm();      //TODO : check if good way to get g_norm (why values so big?)
 
         std::cout << ">> RESULTS" << std::endl; // COUT
-        std::cout << "Displacement  =  " << delta_x << std::endl;
-        std::cout << "Gradient Norm =  " << g_norm << std::endl;
+        std::cout << "Displacement  =  " << sqrt(delta_x) << std::endl;
+        std::cout << "Gradient Norm =  " << sqrt(g_norm) << std::endl;
 
-    }while( (delta_x > m_MinDisplacementAllowed) && (g_norm > m_MinGradAllowed) && (it_count < m_MaxNumberOfIterations) );
+    }while( (delta_x > m_MinDisplacementAllowed*m_MinDisplacementAllowed) && (g_norm > m_MinGradAllowed*m_MinGradAllowed) && (it_count < m_MaxNumberOfIterations) );
 
     std::cout << std::endl << "[Step Length Selection linesearch] End of minimization" << std::endl; // COUT
     std::cout << "# of Energies comp  =  " << cpt_f << std::endl;
