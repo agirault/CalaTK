@@ -113,6 +113,8 @@ public:
    * Public Methods *
    ******************/
 
+  T GetDisplacement();
+
   /**
    * 1D Method that returns the value stored in the x dimension of the
    * vector at the specified grid location
