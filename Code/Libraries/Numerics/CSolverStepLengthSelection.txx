@@ -8,7 +8,7 @@
 template < class TState >
 CSolverStepLengthSelection< TState>::CSolverStepLengthSelection()
   : DefaultMinGradAllowed( 0.1 ), //TODO analyze this value
-    DefaultMinDisplacementAllowed( 0.002 ), //TODO and this value (link to resolution/sizing?)
+    DefaultMinDisplacementAllowed( 0.5 ), //TODO and this value (link to resolution/sizing?)
     DefaultDecreaseConstant( 0.0001 ),
     DefaultMaxNumberOfIterations( 100 ),
     DefaultMaxNumberOfTries( 10 ),
@@ -90,17 +90,20 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
     ObjectiveFunctionType * f = this->GetObjectiveFunction();
     TState x_cur = *f->GetStatePointer();
     T f_cur = f->GetCurrentEnergy().dEnergy; cpt_f++;
+    VectorFieldType map_cur;
+    f->GetCurrentMap(&map_cur);
     f->ComputeGradient(); cpt_g++;
     TState g_cur = *f->GetGradientPointer();
     T g_norm = g_cur.SquaredNorm();
 
     /* Condition on displacement */
-    T delta_x;
-    TState diff;
+    T displacement;
+    VectorFieldType map_temp;
 
     /* variables to store previous values */
     T f_prev;
     T f_new;
+    VectorFieldType map_new;
     T alpha_cur;
     T alpha_prev;
     T alpha_new;
@@ -118,15 +121,15 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
         if (it_count == 1) alpha_cur = 10.0/g_norm;
         else alpha_cur *=5;
         if ( alpha_cur > 0.1 ) alpha_cur = 0.1; // to avoid big steps
-        else if ( alpha_cur < 0.00001 ) alpha_cur = 0.00001; // to avoid big steps
+        else if ( alpha_cur < 0.00001 ) alpha_cur = 0.00001; // to avoid small steps (TODO)
 
         std::cout << "Alpha test    =  " << alpha_cur << std::endl; // COUT
 
         /* get the new position x and its energy f(x) */
         TState *x_new = f->GetStatePointer();
         *x_new = x_cur - g_cur * alpha_cur;
-        f_new = f->GetCurrentEnergy().dEnergy;  cpt_f++;
-
+        f_new = f->GetCurrentEnergy().dEnergy; cpt_f++;
+        f->GetCurrentMap(&map_new);
 
         std::cout << "Energy value  =  " << f_new << std::endl; // COUT
 
@@ -165,7 +168,8 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
 
             /* calculate new value to test for Armijo */
             *x_new = x_cur - g_cur * alpha_cur;
-            f_new  = f->GetCurrentEnergy().dEnergy; cpt_f++;
+            f_new = f->GetCurrentEnergy().dEnergy; cpt_f++;
+            f->GetCurrentMap(&map_new);
 
             std::cout << "Energy value  =  " << f_new << std::endl; // COUT
 
@@ -177,8 +181,11 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
         }
 
         /* Update new values x, f(x) and g(x) */
-        diff    = *x_new - x_cur;
-        delta_x = diff.SquaredNorm();
+        map_temp = map_new;
+        map_temp.SubtractCellwise(&map_cur);
+        displacement = map_temp.GetDisplacement();      // TODO : norm
+        map_cur = map_new;
+
         x_cur   = *x_new;
         f_cur   = f_new;
         f->ComputeGradient(); cpt_g++;
@@ -186,10 +193,10 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
         g_norm  = g_cur.SquaredNorm();      //TODO : check if good way to get g_norm (why values so big?)
 
         std::cout << ">> RESULTS" << std::endl; // COUT
-        std::cout << "Displacement  =  " << sqrt(delta_x) << std::endl;
+        std::cout << "Displacement  =  " << displacement << std::endl;
         std::cout << "Gradient Norm =  " << sqrt(g_norm) << std::endl;
 
-    }while( (delta_x > m_MinDisplacementAllowed*m_MinDisplacementAllowed) && (g_norm > m_MinGradAllowed*m_MinGradAllowed) && (it_count < m_MaxNumberOfIterations) );
+    }while( (displacement > m_MinDisplacementAllowed) && (g_norm > m_MinGradAllowed*m_MinGradAllowed) && (it_count < m_MaxNumberOfIterations) );
 
     std::cout << std::endl << "[Step Length Selection linesearch] End of minimization" << std::endl; // COUT
     std::cout << "# of Energies comp  =  " << cpt_f << std::endl;
