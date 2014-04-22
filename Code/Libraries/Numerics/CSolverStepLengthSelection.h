@@ -26,6 +26,10 @@ public:
   typedef typename Superclass::ObjectiveFunctionType ObjectiveFunctionType;
   typedef typename Superclass::CEnergyValues         CEnergyValues;
 
+  //added for dMap
+  typedef typename ObjectiveFunctionType::VectorFieldType         VectorFieldType;
+
+
 /**
  *Constructor setting the default values
  */
