@@ -192,6 +192,58 @@ void VectorField< T, VImageDimension >::SetZ(unsigned int x, unsigned int y, uns
   this->SetValue(x,y,z,2, value);
 }
 
+//
+// Get Displacement
+//
+template <class T, unsigned int VImageDimension >
+T VectorField< T, VImageDimension  >::GetDisplacement()
+{
+
+    T mean_value = 0;
+
+    if(this->m_Dimension == 1)
+    {
+        for (unsigned int uiIndx = 0; uiIndx < this->m_SizeX; ++uiIndx )
+        {
+            T x_value = this->GetX(uiIndx);
+            mean_value += x_value;
+        }
+        return mean_value/this->m_SizeX;
+    }
+    else if(this->m_Dimension == 2)
+    {
+        for (unsigned int uiIndx = 0; uiIndx < this->m_SizeX; ++uiIndx )
+        {
+            for (unsigned int uiIndy = 0; uiIndy < this->m_SizeY; ++uiIndy )
+            {
+                T x_value = this->GetX(uiIndx,uiIndy);
+                T y_value = this->GetY(uiIndx,uiIndy);
+                T norm_value = sqrt( x_value*x_value + y_value*y_value );
+                mean_value += norm_value;
+            }
+        }
+        return mean_value/(this->m_SizeX*this->m_SizeY);
+    }
+    else if(this->m_Dimension == 3)
+    {
+        for (unsigned int uiIndx = 0; uiIndx < this->m_SizeX; ++uiIndx )
+        {
+            for (unsigned int uiIndy = 0; uiIndy < this->m_SizeY; ++uiIndy )
+            {
+                for (unsigned int uiIndz = 0; uiIndz < this->m_SizeZ; ++uiIndz )
+                {
+                    T x_value = this->GetX(uiIndx,uiIndy,uiIndz);
+                    T y_value = this->GetY(uiIndx,uiIndy,uiIndz);
+                    T z_value = this->GetZ(uiIndx,uiIndy,uiIndz);
+                    T norm_value = sqrt( x_value*x_value + y_value*y_value + z_value*z_value);
+                    mean_value += norm_value;
+                }
+            }
+        }
+        return mean_value/(this->m_SizeX*this->m_SizeY*this->m_SizeZ);
+    }
+}
+
 } // end namespace CALATK
 
 #endif
