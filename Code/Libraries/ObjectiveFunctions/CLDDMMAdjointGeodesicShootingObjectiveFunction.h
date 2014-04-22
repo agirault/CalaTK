@@ -63,6 +63,7 @@ public:
   void InitializeState();
   void InitializeState( TState* ptrState );
 
+  //void GetCurrentMap( VectorFieldType* ptrMap ) { ptrMap = m_ptrMapIn; } // NEW GetCurrentMap
   void GetSourceImage( VectorImageType* ptrIm );
   void GetSourceImage( VectorImageType* ptrIm, T dTime );
   void GetTargetImage( VectorImageType* ptrIm );

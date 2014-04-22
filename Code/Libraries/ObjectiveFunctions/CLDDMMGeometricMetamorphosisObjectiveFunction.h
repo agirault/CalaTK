@@ -52,6 +52,7 @@ public:
   CLDDMMGeometricMetamorphosisObjectiveFunction();
   virtual ~CLDDMMGeometricMetamorphosisObjectiveFunction();
 
+  //void GetCurrentMap( VectorFieldType* ptrMap ) { ptrMap = m_ptrMapIn; } // NEW GetCurrentMap
   void GetImageT( VectorImageType* ptrIm, T dTime );
   void GetSourceImage( VectorImageType* ptrIm );
   void GetSourceImage( VectorImageType* ptrIm, T dTime );

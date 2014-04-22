@@ -77,6 +77,7 @@ public:
 
   /** Compute the gradient of the objective function and store it in the gradient member variable */
   virtual void ComputeGradient();
+  virtual void GetCurrentMap(VectorFieldType* ptrMap) {}
 
 protected:
   typename StateType::Pointer m_ptrState;
