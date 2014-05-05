@@ -52,7 +52,6 @@ public:
   CLDDMMGeometricMetamorphosisObjectiveFunction();
   virtual ~CLDDMMGeometricMetamorphosisObjectiveFunction();
 
-  //void GetCurrentMap( VectorFieldType* ptrMap ) { ptrMap = m_ptrMapIn; } // NEW GetCurrentMap
   void GetImageT( VectorImageType* ptrIm, T dTime );
   void GetSourceImage( VectorImageType* ptrIm );
   void GetSourceImage( VectorImageType* ptrIm, T dTime );
@@ -61,6 +60,10 @@ public:
   void GetMomentum( VectorImageType* ptrMomentum, T dTime );
   void GetInitialMomentum( VectorImageType* ptrMomentum );
 
+  VectorFieldType* GetCurrentMap() const
+  {
+      return m_ptrMapIn;
+  }
   CEnergyValues GetCurrentEnergy();
   void ComputeGradient();
 

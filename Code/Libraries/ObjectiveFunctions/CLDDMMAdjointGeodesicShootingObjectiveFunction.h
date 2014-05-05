@@ -63,7 +63,6 @@ public:
   void InitializeState();
   void InitializeState( TState* ptrState );
 
-  //void GetCurrentMap( VectorFieldType* ptrMap ) { ptrMap = m_ptrMapIn; } // NEW GetCurrentMap
   void GetSourceImage( VectorImageType* ptrIm );
   void GetSourceImage( VectorImageType* ptrIm, T dTime );
   void GetTargetImage( VectorImageType* ptrIm );
@@ -73,6 +72,10 @@ public:
   void GetMap( VectorFieldType* ptrMap, T dTime );
   void GetMapFromTo(VectorFieldType *ptrMap, T dTimeFrom, T dTimeTo);
 
+  VectorFieldType* GetCurrentMap() const
+  {
+      return m_ptrMapIn;
+  }
   CEnergyValues GetCurrentEnergy();
   void ComputeGradient();
   void ComputeInitialUnsmoothedVelocityGradient( VectorFieldType *ptrInitialUnsmoothedVelocityGradient, unsigned int uiNumberOfKernel = 0 );
