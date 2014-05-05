@@ -199,16 +199,19 @@ template <class T, unsigned int VImageDimension >
 T VectorField< T, VImageDimension  >::GetDisplacement()
 {
 
-    T mean_value = 0;
+    //T mean_value = 0;
+    T max_value = 0;
 
     if(this->m_Dimension == 1)
     {
         for (unsigned int uiIndx = 0; uiIndx < this->m_SizeX; ++uiIndx )
         {
             T x_value = this->GetX(uiIndx);
-            mean_value += x_value;
+            //mean_value += fabs(x_value);
+            if (x_value > max_value) max_value = fabs(x_value);
         }
-        return mean_value/this->m_SizeX;
+        //return mean_value/this->m_SizeX;
+        return max_value;
     }
     else if(this->m_Dimension == 2)
     {
@@ -219,10 +222,12 @@ T VectorField< T, VImageDimension  >::GetDisplacement()
                 T x_value = this->GetX(uiIndx,uiIndy);
                 T y_value = this->GetY(uiIndx,uiIndy);
                 T norm_value = sqrt( x_value*x_value + y_value*y_value );
-                mean_value += norm_value;
+                //mean_value += norm_value;
+                if (norm_value > max_value) max_value = norm_value;
             }
         }
-        return mean_value/(this->m_SizeX*this->m_SizeY);
+        //return mean_value/(this->m_SizeX*this->m_SizeY);
+        return max_value;
     }
     else if(this->m_Dimension == 3)
     {
@@ -236,11 +241,17 @@ T VectorField< T, VImageDimension  >::GetDisplacement()
                     T y_value = this->GetY(uiIndx,uiIndy,uiIndz);
                     T z_value = this->GetZ(uiIndx,uiIndy,uiIndz);
                     T norm_value = sqrt( x_value*x_value + y_value*y_value + z_value*z_value);
-                    mean_value += norm_value;
+                    //mean_value += norm_value;
+                    if (norm_value > max_value) max_value = norm_value;
                 }
             }
         }
-        return mean_value/(this->m_SizeX*this->m_SizeY*this->m_SizeZ);
+        //return mean_value/(this->m_SizeX*this->m_SizeY*this->m_SizeZ);
+        return max_value;
+    }
+    else
+    {
+        return -1.0;
     }
 }
 
