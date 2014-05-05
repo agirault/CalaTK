@@ -75,6 +75,10 @@ public:
   void GetMapFromTo(VectorFieldType *ptrMap, T dTimeFrom, T dTimeTo);
   void GetMapFromToAndImageAtFinalTime( VectorFieldType* ptrMap, VectorImageType* ptrIm, T dTimeFrom, T dTimeTo );
 
+  VectorFieldType* GetCurrentMap() const
+  {
+      return m_ptrMapIn;
+  }
   CEnergyValues GetCurrentEnergy();
   void ComputeGradient();
   void ComputeInitialUnsmoothedVelocityGradient( VectorFieldType *ptrInitialUnsmoothedVelocityGradient, unsigned int uiKernelNumber = 0 );
