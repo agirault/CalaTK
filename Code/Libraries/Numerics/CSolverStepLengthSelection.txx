@@ -113,23 +113,21 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
         std::cout << std::endl << ">> ITERATION " << it_count << std::endl; // COUT
 
         /* compute alpha0 */
-        if (it_count == 1) alpha_cur = 10.0/g_norm;
-        else alpha_cur *=5;
-        if ( alpha_cur > 0.1 ) alpha_cur = 0.1; // to avoid big steps
-        else if ( alpha_cur < 0.00001 ) alpha_cur = 0.00001; // to avoid small steps (TODO)
-
+        if (it_count == 1) alpha_cur = 100.0/g_norm; // TODO : find a better alpha0 (100 or 10 /g_norm...)
+        else alpha_cur *=3;
+        if ( alpha_cur > 1 ) alpha_cur = 1; // to avoid big steps
+        //else if ( alpha_cur < 0.00001 ) alpha_cur = 0.00001; // to avoid small steps
         std::cout << "Alpha test    =  " << alpha_cur << std::endl; // COUT
 
         /* get the new position x and its energy f(x) */
         TState *x_new = f->GetStatePointer();
         *x_new = x_cur - g_cur * alpha_cur;
         f_new = f->GetCurrentEnergy().dEnergy; cpt_f++;
-
         std::cout << "Energy value  =  " << f_new << std::endl; // COUT
 
         /* Test Armijo condition (tries) */
         unsigned int it_armijo = 0;
-        while( (f_new > f_cur - m_DecreaseConstant * alpha_cur * g_norm) && (it_armijo < m_MaxNumberOfTries) ) //TODO : is it correct for g_norm?
+        while( (f_new > f_cur - m_DecreaseConstant * alpha_cur * g_norm) && (it_armijo < m_MaxNumberOfTries) )
         {
             it_armijo++;
             std::cout << ">>> TRY " << it_armijo << std::endl; // COUT
@@ -163,41 +161,46 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
             /* calculate new value to test for Armijo */
             *x_new = x_cur - g_cur * alpha_cur;
             f_new = f->GetCurrentEnergy().dEnergy; cpt_f++;
-
             std::cout << "Energy value  =  " << f_new << std::endl; // COUT
 
         }
         if( it_armijo == m_MaxNumberOfTries)
         {
-            std::cout << "[!] Could not reduce Energy"<< std::endl;
-            return false; // TODO : make sure this is correct.
+            std::cout << "[!] Could not reduce Energy [!]"<< std::endl;
+
+            /* TODO : make sure this is correct
+             * I guess we should try to save the last state
+             * and put the objectivefunction back to it?
+             */
+
+            break;
         }
 
-        /* Get maximum displacement */
-        VectorFieldType * map_new = new VectorFieldType(f->GetCurrentMap());
+        /* Evaluate displacement */
+        VectorFieldType * map_new = f->GetCurrentMap();
         map_cur->SubtractCellwise(map_new);
         displacement = map_cur->GetDisplacement();
-        delete map_cur;
+        std::cout << "Displacement  =  " << displacement << std::endl; //COUT
+
+        /* Check if condition enough to stop */
+        if (displacement <= m_MinDisplacementAllowed || (it_count >=  m_MaxNumberOfIterations)) break;
 
         /* Update new values map, x, f(x) and g(x) */
-        map_cur = map_new;
+        map_cur->Copy(map_new);
         x_cur   = *x_new;
         f_cur   = f_new;
         f->ComputeGradient(); cpt_g++;
         g_cur   =  *f->GetGradientPointer();
         g_norm  = g_cur.SquaredNorm();
-
-        std::cout << ">> RESULTS" << std::endl; // COUT
-        std::cout << "Displacement  =  " << displacement << std::endl;
         std::cout << "Gradient Norm =  " << sqrt(g_norm) << std::endl;
 
-    }while( (displacement > m_MinDisplacementAllowed) && (g_norm > m_MinGradAllowed*m_MinGradAllowed) && (it_count < m_MaxNumberOfIterations) );
-
-    delete map_cur;
+    }while( (g_norm > m_MinGradAllowed*m_MinGradAllowed));
 
     std::cout << std::endl << "[Step Length Selection linesearch] End of minimization" << std::endl; // COUT
     std::cout << "# of Energies comp  =  " << cpt_f << std::endl;
     std::cout << "# of Gradient comp  =  " << cpt_g << std::endl;
+
+    delete map_cur;
     return true;
 }
 
