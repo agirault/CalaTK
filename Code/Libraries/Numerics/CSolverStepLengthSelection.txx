@@ -183,7 +183,10 @@ bool CSolverStepLengthSelection< TState>::SolvePreInitialized()
         std::cout << "Displacement  =  " << displacement << std::endl; //COUT
 
         /* Check if condition enough to stop */
-        if (displacement <= m_MinDisplacementAllowed || (it_count >=  m_MaxNumberOfIterations)) break;
+        if (((displacement <= m_MinDisplacementAllowed) && (it_count != 1)) || (it_count >=  m_MaxNumberOfIterations))
+        {
+            break;
+        }
 
         /* Update new values map, x, f(x) and g(x) */
         map_cur->Copy(map_new);
