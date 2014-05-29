@@ -57,6 +57,9 @@ public:
   typedef VectorField< T, 2 > VectorFieldType2D;
   typedef VectorField< T, 3 > VectorFieldType3D;
 
+  typedef itk::Vector<T,VImageDimension> DeformationPixelType;
+  typedef itk::Image<DeformationPixelType, VImageDimension> DeformationImageType;
+
   /**
     * Method that that takes a vector image and replaces all its elements by the max of the element value and a given value
     *
@@ -430,7 +433,7 @@ public:
    *
    * @param im - the input image
    */
-  static typename ITKVectorImage<T,VImageDimension>::Type::Pointer convertToITK( const VectorImageType1D* im);
+  static typename DeformationImageType::Pointer convertToITK( const VectorImageType1D* im);
 
   /**
    * 2D Method that takes a VectorImageType and returns an ITK image.  The returned
@@ -440,7 +443,7 @@ public:
    *
    * @param im - the input image
    */
-  static typename ITKVectorImage<T,VImageDimension>::Type::Pointer convertToITK( const VectorImageType2D* im);
+  static typename DeformationImageType::Pointer convertToITK( const VectorImageType2D* im);
 
   /**
    * 3D Method that takes a VectorImageType and returns an ITK image.  The returned
@@ -450,7 +453,7 @@ public:
    *
    * @param im - the input image
    */
-  static typename ITKVectorImage<T,VImageDimension>::Type::Pointer convertToITK( const VectorImageType3D* im);
+  static typename DeformationImageType::Pointer convertToITK( const VectorImageType3D* im);
   
   /**
    * 2D Method that converts a single dimension of a VectorImageType to an ITK
@@ -487,27 +490,7 @@ public:
    *
    * @param itkIm - the input image
    */
-  static VectorImageType* convertFromITK( typename ITKVectorImage<T,1>::Type* itkIm);
-
-  /**
-   * Method that takes an itk::Image<T, 4> and returns a VectorImageType.
-   * The input image should be formatted such that the first dimension is the
-   * x dimension, the second is the y dimension, the third is the z dimension,
-   * and the fourth is the vector dimension.
-   *
-   * @param itkIm - the input image
-   */
-  static VectorImageType* convertFromITK( typename ITKVectorImage<T,2>::Type* itkIm);
-
-  /**
-   * Method that takes an itk::Image<T, 4> and returns a VectorImageType.
-   * The input image should be formatted such that the first dimension is the
-   * x dimension, the second is the y dimension, the third is the z dimension,
-   * and the fourth is the vector dimension.
-   *
-   * @param itkIm - the input image
-   */
-  static VectorImageType* convertFromITK( typename ITKVectorImage<T,3>::Type* itkIm);
+  static VectorImageType* convertFromITK( DeformationImageType* itkIm);
 
   /**
    * 1D Method that converts a non-vector ITK image into a single dimension
