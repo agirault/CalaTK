@@ -406,7 +406,7 @@ CImageInformation< TFloat, VImageDimension >::GetOriginalImage()
         // load it from file
         std::cout << "Loading " << m_ImageFileName << " ... ";
         std::string expandedImageFileName = ApplicationUtils::findDataFileName( m_ImageFileName );
-        m_OriginalImage = VectorImageUtils< TFloat, VImageDimension>::readFileITK( expandedImageFileName );
+        m_OriginalImage = VectorImageUtils< TFloat, VImageDimension>::readImageITK( expandedImageFileName );
 
         if ( m_OriginalImage.GetPointer() == NULL )
         {

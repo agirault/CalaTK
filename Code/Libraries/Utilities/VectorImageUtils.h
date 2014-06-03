@@ -411,7 +411,10 @@ public:
   /***************************
    * ITK interface functions *
    ***************************/
-  
+
+  static void HFieldToDeformationFieldImageFilter(typename DeformationImageType::Pointer itkImage);
+  static void DeformationFieldToHFieldImageFilter(typename DeformationImageType::Pointer itkImage);
+
   /**
    * Method that takes a VectorImage2D and returns an unsigned char valued
    * ITK image.  The image is 2D.  This method should only be used for images
@@ -491,6 +494,9 @@ public:
    * @param itkIm - the input image
    */
   static VectorImageType* convertFromITK( DeformationImageType* itkIm);
+  static VectorImageType* convertFromITK( typename ITKVectorImage<T,1>::Type* itkIm);
+  static VectorImageType* convertFromITK( typename ITKVectorImage<T,2>::Type* itkIm);
+  static VectorImageType* convertFromITK( typename ITKVectorImage<T,3>::Type* itkIm);
 
   /**
    * 1D Method that converts a non-vector ITK image into a single dimension
@@ -632,7 +638,8 @@ public:
    *
    * @param filename - the name of the file to write to
    */
-  static VectorImageType* readFileITK(const std::string& filename);
+  static VectorImageType* readMapITK(const std::string& filename);
+  static VectorImageType* readImageITK(const std::string& filename);
 
   /**
    * Method that reads an ITK affine transform from a file

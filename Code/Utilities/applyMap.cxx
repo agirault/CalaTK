@@ -42,9 +42,9 @@ int DoIt( int argc, char **argv )
   typedef typename VectorFieldUtilsType::VectorFieldType VectorFieldType; 
   typedef typename CALATK::LDDMMUtils< TFLOAT, VImageDimension > LDDMMUtilsType;
 
-  VectorImageType* ptrMapInVecIm = VectorImageUtilsType::readFileITK( sourceToTargetMap );
-  const VectorFieldType* ptrMapIn = static_cast< VectorFieldType* >( ptrMapInVecIm ); 
-  const VectorImageType* ptrImSource = VectorImageUtilsType::readFileITK( sourceImage );
+  VectorImageType* ptrMapInVecIm = VectorImageUtilsType::readMapITK( sourceToTargetMap );
+  const VectorFieldType* ptrMapIn = static_cast< VectorFieldType* >( ptrMapInVecIm );
+  const VectorImageType* ptrImSource = VectorImageUtilsType::readImageITK( sourceImage );
 
   typename VectorImageType::Pointer ptrImTarget = new VectorImageType( ptrImSource );
 

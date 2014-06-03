@@ -1173,6 +1173,69 @@ bool VectorImageUtils< T, VImageDimension >::IsSameSize( const VectorImageType* 
 // ITK Interface Functions //
 /////////////////////////////
 
+template <class T, unsigned int VImageDimension >
+void VectorImageUtils< T, VImageDimension >::HFieldToDeformationFieldImageFilter(typename DeformationImageType::Pointer itkImage)
+{
+
+  itk::ImageRegionIteratorWithIndex<DeformationImageType> it = itk::ImageRegionIteratorWithIndex<DeformationImageType>(
+    itkImage, itkImage->GetLargestPossibleRegion());
+
+  for(it.GoToBegin();!it.IsAtEnd(); ++it)
+    {
+      typename DeformationImageType::PixelType hFieldValue = it.Get();
+      typename DeformationImageType::IndexType index = it.GetIndex();
+
+      typedef typename DeformationImageType::PixelType::ValueType CoordRepType;
+      const unsigned int Dimension = DeformationImageType::ImageDimension;
+      itk::Point<CoordRepType, Dimension> ipt;
+      itkImage->TransformIndexToPhysicalPoint(index,ipt);
+
+      typename DeformationImageType::PixelType pixelPoint;
+      for(unsigned int i = 0; i < Dimension; ++i)
+      {
+        pixelPoint[i] = ipt[i];
+      }
+
+      /* Issues with space directions */
+      //hFieldValue[0] = -hFieldValue[0];
+      //hFieldValue[1] = -hFieldValue[1];
+
+      typename DeformationImageType::PixelType displacementValue = hFieldValue - pixelPoint;
+
+      it.Set(displacementValue);
+    }
+}
+
+
+template <class T, unsigned int VImageDimension >
+void VectorImageUtils< T, VImageDimension >::DeformationFieldToHFieldImageFilter(typename DeformationImageType::Pointer itkImage)
+{
+
+  itk::ImageRegionIteratorWithIndex<DeformationImageType> it = itk::ImageRegionIteratorWithIndex<DeformationImageType>(
+    itkImage, itkImage->GetLargestPossibleRegion());
+
+  for(it.GoToBegin();!it.IsAtEnd(); ++it)
+    {
+      typename DeformationImageType::PixelType displacementValue = it.Get();
+      typename DeformationImageType::IndexType index = it.GetIndex();
+
+      typedef typename DeformationImageType::PixelType::ValueType CoordRepType;
+      const unsigned int Dimension = DeformationImageType::ImageDimension;
+      itk::Point<CoordRepType, Dimension> ipt;
+      itkImage->TransformIndexToPhysicalPoint(index,ipt);
+
+      typename DeformationImageType::PixelType pixelPoint;
+      for(unsigned int i = 0; i < Dimension; ++i)
+      {
+        pixelPoint[i] = ipt[i];
+      }
+
+      typename DeformationImageType::PixelType hFieldValue = displacementValue + pixelPoint;
+
+      it.Set(hFieldValue);
+    }
+}
+
 //
 // to ITK (int)
 //
@@ -1731,7 +1794,7 @@ typename ITKImage<T,VImageDimension>::Type::Pointer VectorImageUtils< T, VImageD
 }
 
 //
-// from ITK, 1D 2D and 3D
+// from ITK, 1D 2D and 3D (Map)
 //
 template <class T, unsigned int VImageDimension >
 typename VectorImageUtils< T, VImageDimension >::VectorImageType*
@@ -1908,6 +1971,156 @@ VectorImageUtils< T, VImageDimension >::convertFromITK( DeformationImageType* it
 
   return outImage;
   }
+}
+
+//
+// from ITK, 1D
+//
+template <class T, unsigned int VImageDimension >
+typename VectorImageUtils< T, VImageDimension >::VectorImageType*
+VectorImageUtils< T, VImageDimension >::convertFromITK( typename ITKVectorImage<T,1>::Type* itkIm)
+{
+  if ( VImageDimension!= 1 )
+    {
+    throw std::runtime_error( "ConvertFromITK1D can only be used in 1D." );
+    }
+
+  typename ITKVectorImage<T,VImageDimension>::Type::RegionType region = itkIm->GetLargestPossibleRegion();
+  typename ITKVectorImage<T,VImageDimension>::Type::SizeType size = region.GetSize();
+  typename ITKVectorImage<T,VImageDimension>::Type::SpacingType space = itkIm->GetSpacing();
+
+  unsigned int szX = size[0];
+  unsigned int dim = size[1];
+
+  // An exception to the rule -- since we an generating this new image, we do
+  // not assign to a smart pointer.
+  VectorImageType * outImage = new VectorImageType(szX, dim);
+  outImage->SetSpacingX( space[0] );
+
+  for (unsigned int x = 0; x < szX; ++x)
+    {
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+      typename ITKVectorImage<T,VImageDimension>::Type::IndexType idx;
+      idx[0] = x;
+      idx[1] = d;
+      T dCurrentElement = itkIm->GetPixel( idx );
+      outImage->SetValue(x,d, dCurrentElement );
+      }
+    }
+
+  // Set origin and direction
+  outImage->SetOrigin(itkIm->GetOrigin());
+  outImage->SetDirection(itkIm->GetDirection());
+
+  return outImage;
+}
+
+
+//
+// from ITK, 2D
+//
+template <class T, unsigned int VImageDimension >
+typename VectorImageUtils< T, VImageDimension >::VectorImageType*
+VectorImageUtils< T, VImageDimension >::convertFromITK( typename ITKVectorImage<T,2>::Type* itkIm)
+{
+  if ( VImageDimension!= 2 )
+    {
+    throw std::runtime_error( "ConvertFromITK2D can only be used in 2D." );
+    }
+
+  typename ITKVectorImage<T,VImageDimension>::Type::RegionType region = itkIm->GetLargestPossibleRegion();
+  typename ITKVectorImage<T,VImageDimension>::Type::SizeType size = region.GetSize();
+  typename ITKVectorImage<T,VImageDimension>::Type::SpacingType space = itkIm->GetSpacing();
+
+  unsigned int szX = size[0];
+  unsigned int szY = size[1];
+  unsigned int dim = size[2];
+
+  // An exception to the rule -- since we an generating this new image, we do
+  // not assign to a smart pointer.
+  VectorImageType * outImage = new VectorImageType(szX, szY, dim );
+  outImage->SetSpacingX( space[0] );
+  outImage->SetSpacingY( space[1] );
+
+  for (unsigned int y = 0; y < szY; ++y)
+    {
+    for (unsigned int x = 0; x < szX; ++x)
+      {
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+        typename ITKVectorImage<T,VImageDimension>::Type::IndexType idx;
+        idx[0] = x;
+        idx[1] = y;
+        idx[2] = d;
+        T dCurrentElement = itkIm->GetPixel( idx );
+        outImage->SetValue(x,y,d, dCurrentElement );
+        }
+      }
+    }
+
+  // Set origin and direction
+  outImage->SetOrigin(itkIm->GetOrigin());
+  outImage->SetDirection(itkIm->GetDirection());
+
+  return outImage;
+}
+
+
+//
+// from ITK, 3D
+//
+template <class T, unsigned int VImageDimension >
+typename VectorImageUtils< T, VImageDimension>::VectorImageType*
+VectorImageUtils< T, VImageDimension >::convertFromITK( typename ITKVectorImage<T,3>::Type* itkIm)
+{
+
+  if ( VImageDimension!= 3 )
+    {
+    throw std::runtime_error( "ConvertFromITK3D can only be used in 3D." );
+    }
+
+  typename ITKVectorImage<T,VImageDimension>::Type::RegionType region = itkIm->GetLargestPossibleRegion();
+  typename ITKVectorImage<T,VImageDimension>::Type::SizeType size = region.GetSize();
+  typename ITKVectorImage<T,VImageDimension>::Type::SpacingType space = itkIm->GetSpacing();
+  unsigned int szX = size[0];
+  unsigned int szY = size[1];
+  unsigned int szZ = size[2];
+  unsigned int dim = size[3];
+
+  // An exception to the rule -- since we an generating this new image, we do
+  // not assign to a smart pointer.
+  VectorImageType * outImage = new VectorImageType(szX, szY, szZ, dim );
+  outImage->SetSpacingX( space[0] );
+  outImage->SetSpacingY( space[1] );
+  outImage->SetSpacingZ( space[2] );
+
+  for (unsigned int z = 0; z < szZ; ++z)
+    {
+    for (unsigned int y = 0; y < szY; ++y)
+      {
+      for (unsigned int x = 0; x < szX; ++x)
+        {
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+
+          typename ITKVectorImage<T,VImageDimension>::Type::IndexType px;
+          px[0] = x;
+          px[1] = y;
+          px[2] = z;
+          px[3] = d;
+
+          outImage->SetValue(x,y,z,d, itkIm->GetPixel(px));
+          }
+        }
+      }
+    }
+
+  // Set origin and direction
+  outImage->SetOrigin(itkIm->GetOrigin());
+  outImage->SetDirection(itkIm->GetDirection());
+
+  return outImage;
 }
 
 //
@@ -2504,6 +2717,8 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK( const VectorImageType
     typename DeformationImageType::Pointer itkImage;
     itkImage = VectorImageUtils< T, VImageDimension >::convertToITK(im);
 
+    HFieldToDeformationFieldImageFilter(itkImage);
+
     // Initialize ITK writer
     typename itk::ImageFileWriter<DeformationImageType>::Pointer writer = itk::ImageFileWriter<DeformationImageType>::New();
     writer->SetFileName(filename.c_str());
@@ -2525,6 +2740,7 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK( const VectorImageType
 
   return true;
 }
+
 
 //
 // writeTimeDependantImagesITK, 1D
@@ -3075,7 +3291,7 @@ bool VectorImageUtils< T, VImageDimension >::writeTimeDependantImagesITK( const 
 //
 template <class T, unsigned int VImageDimension >
 typename VectorImageUtils< T, VImageDimension >::VectorImageType*
-VectorImageUtils< T, VImageDimension >::readFileITK(const std::string& filename)
+VectorImageUtils< T, VImageDimension >::readMapITK(const std::string& filename)
 {
 
   // Initialize ITK reader
@@ -3097,8 +3313,39 @@ VectorImageUtils< T, VImageDimension >::readFileITK(const std::string& filename)
     return NULL;
     }
 
+    DeformationFieldToHFieldImageFilter(itkImage);
+
   // Convert to VectorImageType and return
-  return VectorImageUtils< T, VImageDimension >::convertFromITK(itkImage.GetPointer());
+  return VectorImageUtils< T, VImageDimension >::convertFromITK(itkImage);
+}
+
+template <class T, unsigned int VImageDimension >
+typename VectorImageUtils< T, VImageDimension >::VectorImageType*
+VectorImageUtils< T, VImageDimension >::readImageITK(const std::string& filename)
+{
+
+  // Initialize ITK reader
+  typedef typename ITKVectorImageReader<T, VImageDimension>::Type ITKVectorImageReaderType;
+  typename ITKVectorImageReaderType::Pointer reader = ITKVectorImageReaderType::New();
+  reader->SetFileName(filename.c_str());
+
+  // Initialize ITK image
+  typename ITKVectorImage<T,VImageDimension>::Type::Pointer itkImage;
+  itkImage = reader->GetOutput();
+
+  // Try to read the image
+  try
+    {
+    reader->Update();
+    }
+  catch( itk::ExceptionObject & err )
+    {
+    throw std::runtime_error( "VectorImageUtils< T, VImageDimension >::readFileITK -> Reading Failed" );
+    return NULL;
+    }
+
+  // Convert to VectorImageType and return
+  return VectorImageUtils< T, VImageDimension >::convertFromITK(itkImage);
 }
 
 //
