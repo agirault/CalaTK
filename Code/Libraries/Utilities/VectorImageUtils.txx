@@ -1187,20 +1187,25 @@ void VectorImageUtils< T, VImageDimension >::HFieldToDeformationFieldImageFilter
 
       typedef typename DeformationImageType::PixelType::ValueType CoordRepType;
       const unsigned int Dimension = DeformationImageType::ImageDimension;
-      itk::Point<CoordRepType, Dimension> ipt;
-      itkImage->TransformIndexToPhysicalPoint(index,ipt);
+      itk::Point<CoordRepType, Dimension> pointIndex;
+      itkImage->TransformIndexToPhysicalPoint(index,pointIndex);
 
-      typename DeformationImageType::PixelType pixelPoint;
+      typename DeformationImageType::PixelType pixelIndex;
       for(unsigned int i = 0; i < Dimension; ++i)
       {
-        pixelPoint[i] = ipt[i];
+        pixelIndex[i] = pointIndex[i];
       }
 
-      /* Issues with space directions */
-      //hFieldValue[0] = -hFieldValue[0];
-      //hFieldValue[1] = -hFieldValue[1];
+      typename DeformationImageType::DirectionType direction = itkImage->GetDirection();
 
-      typename DeformationImageType::PixelType displacementValue = hFieldValue - pixelPoint;
+      typename DeformationImageType::PointType pointOrigin = itkImage->GetOrigin();
+      typename DeformationImageType::PixelType pixelOrigin;
+      for(unsigned int i = 0; i < Dimension; ++i)
+      {
+        pixelOrigin[i] = pointOrigin[i];
+      }
+
+      typename DeformationImageType::PixelType displacementValue = direction*hFieldValue + pixelOrigin - pixelIndex;
 
       it.Set(displacementValue);
     }
@@ -1221,16 +1226,25 @@ void VectorImageUtils< T, VImageDimension >::DeformationFieldToHFieldImageFilter
 
       typedef typename DeformationImageType::PixelType::ValueType CoordRepType;
       const unsigned int Dimension = DeformationImageType::ImageDimension;
-      itk::Point<CoordRepType, Dimension> ipt;
-      itkImage->TransformIndexToPhysicalPoint(index,ipt);
+      itk::Point<CoordRepType, Dimension> pointIndex;
+      itkImage->TransformIndexToPhysicalPoint(index,pointIndex);
 
-      typename DeformationImageType::PixelType pixelPoint;
+      typename DeformationImageType::PixelType pixelIndex;
       for(unsigned int i = 0; i < Dimension; ++i)
       {
-        pixelPoint[i] = ipt[i];
+        pixelIndex[i] = pointIndex[i];
       }
 
-      typename DeformationImageType::PixelType hFieldValue = displacementValue + pixelPoint;
+      typename DeformationImageType::DirectionType invDirection = itkImage->GetInverseDirection();
+
+      typename DeformationImageType::PointType pointOrigin = itkImage->GetOrigin();
+      typename DeformationImageType::PixelType pixelOrigin;
+      for(unsigned int i = 0; i < Dimension; ++i)
+      {
+        pixelOrigin[i] = pointOrigin[i];
+      }
+
+      typename DeformationImageType::PixelType hFieldValue = invDirection*(displacementValue - pixelOrigin + pixelIndex); // TODO : fix
 
       it.Set(hFieldValue);
     }
