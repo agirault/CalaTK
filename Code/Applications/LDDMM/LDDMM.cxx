@@ -272,18 +272,13 @@ int main(int argc, char **argv)
   std::cout << "Image dimension = " << uiSourceImageDimension << std::endl;
 
   unsigned int uiImageDimension = uiSourceImageDimension;
+  CALATK::CheckIfSameHeader(sourceImage, targetImage, uiImageDimension);
+
   if ( iDimension!= 0 && iDimension>0 )
   {
     std::cout << "Using externally specified image dimension: dim = " << iDimension << std::endl;
     uiImageDimension = (unsigned int)iDimension;
   }
-
-
-  std::cout<<sourceToTargetMap<<std::endl;
-  size_t found=sourceToTargetMap.find_last_of("/\\");
-  std::string energyFilepath = sourceToTargetMap.substr(0,found) + "/RegEnergy.txt";
-  std::cout<<energyFilepath<<std::endl;
-
 
 #ifdef FLOATING_POINT_CHOICE
   DoItNDWithType( sFloatingPointType, uiImageDimension, argc, argv );

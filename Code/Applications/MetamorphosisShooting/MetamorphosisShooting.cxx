@@ -196,6 +196,8 @@ int main(int argc, char **argv)
   std::cout << "Image dimension = " << uiSourceImageDimension << std::endl;
 
   unsigned int uiImageDimension = uiSourceImageDimension;
+  CALATK::CheckIfSameHeader(sourceImage, targetImage, uiImageDimension);
+
   if ( iDimension!= 0 && iDimension>0 )
   {
     std::cout << "Using externally specified image dimension: dim = " << iDimension << std::endl;
