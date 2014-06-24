@@ -64,6 +64,8 @@ public:
 /** Getting effective image dimensions (i.e., number of non-singleton dimensions), so that we can instantiate objects of the right dimension */
 
 unsigned int GetNonSingletonImageDimensionFromFile( const std::string & sourceImage );
+void CheckIfSameHeader(const std::string & imageOrig1, const std::string & imageOrig2, unsigned int uiDim);
+
 
 /** ND simulated templated typdefs */
 

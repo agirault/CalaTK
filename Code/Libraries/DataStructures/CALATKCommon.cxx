@@ -98,7 +98,7 @@ unsigned int GetNonSingletonImageDimensionFromFile( const std::string & sourceIm
 
   for ( unsigned int iI=0; iI<uiDim; ++iI )
     {
-    std::cout << "dim " << iI << " = " << imageIO->GetDimensions( iI ) << std::endl;
+    //std::cout << "dim " << iI << " = " << imageIO->GetDimensions( iI ) << std::endl;
     if ( imageIO->GetDimensions( iI ) > 1 )
       {
       ++uiEff;
@@ -107,6 +107,68 @@ unsigned int GetNonSingletonImageDimensionFromFile( const std::string & sourceIm
 
   return uiEff;
 
+}
+
+void CheckIfSameHeader(const std::string & imageOrig1, const std::string & imageOrig2, unsigned int uiDim)
+{
+
+    std::string imageName1 = ApplicationUtils::findDataFileName( imageOrig1 );
+    itk::ImageIOBase::Pointer image1 = itk::ImageIOFactory::CreateImageIO( imageName1.c_str(), itk::ImageIOFactory::ReadMode );
+    if( !image1 )
+    {
+      std::string message = "No itk::ImageIO was found for image: " + imageName1;
+      throw std::runtime_error( message.c_str() );
+    }
+    image1->SetFileName( imageName1.c_str() );
+    image1->ReadImageInformation();
+    std::string imageName2 = ApplicationUtils::findDataFileName( imageOrig2 );
+    itk::ImageIOBase::Pointer image2 = itk::ImageIOFactory::CreateImageIO( imageName2.c_str(), itk::ImageIOFactory::ReadMode );
+    if( !image2 )
+    {
+      std::string message = "No itk::ImageIO was found for image: " + imageName2;
+      throw std::runtime_error( message.c_str() );
+    }
+    image2->SetFileName( imageName2.c_str() );
+    image2->ReadImageInformation();
+
+    for ( unsigned int iI=0; iI<uiDim; ++iI )
+    {
+        itk::SizeValueType dim1 = image1->GetDimensions( iI );
+        itk::SizeValueType dim2 = image2->GetDimensions( iI );
+        if (dim1 != dim2)
+        {
+            std::cout << imageOrig1 << " : dim(" << iI << ") = " << dim1 << std::endl;
+            std::cout << imageOrig2 << " : dim(" << iI << ") = " << dim2 << std::endl;
+            throw std::runtime_error("Images size do not match ");
+        }
+
+        std::vector<double> dir1 = image1->GetDirection( iI );
+        std::vector<double> dir2 = image2->GetDirection( iI );
+        if (dir1 != dir2)
+        {
+            std::cout << imageOrig1 << " : spaceDirection(" << iI << ") = " << dir1 << std::endl;
+            std::cout << imageOrig2 << " : spaceDirection(" << iI << ") = " << dir2 << std::endl;
+            throw std::runtime_error("Images space direction do not match ");
+        }
+
+        double spacing1 = image1->GetSpacing( iI );
+        double spacing2 = image2->GetSpacing( iI );
+        if (spacing1 != spacing2)
+        {
+            std::cout << imageOrig1 << " : spacing(" << iI << ") = " << spacing1 << std::endl;
+            std::cout << imageOrig2 << " : spacing(" << iI << ") = " << spacing2 << std::endl;
+            throw std::runtime_error("Images spacing do not match ");
+        }
+
+        double origin1 = image1->GetOrigin( iI );
+        double origin2 = image2->GetOrigin( iI );
+        if (origin1 != origin2)
+        {
+            std::cout << imageOrig1 << " : origin(" << iI << ") = " << origin1 << std::endl;
+            std::cout << imageOrig2 << " : origin(" << iI << ") = " << origin2 << std::endl;
+            throw std::runtime_error("Images origin do not match ");
+        }
+    }
 }
 
 }
