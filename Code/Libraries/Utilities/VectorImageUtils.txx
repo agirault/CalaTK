@@ -3275,7 +3275,7 @@ bool VectorImageUtils< T, VImageDimension >::writeTimeDependantImagesITK( const 
 //
 template <class T, unsigned int VImageDimension >
 typename VectorImageUtils< T, VImageDimension >::VectorImageType*
-VectorImageUtils< T, VImageDimension >::readMapITK(const std::string& filename)
+VectorImageUtils< T, VImageDimension >::readMapITK(const std::string& filename, bool readAsDisplacement )
 {
 
   // Initialize ITK reader
@@ -3297,7 +3297,10 @@ VectorImageUtils< T, VImageDimension >::readMapITK(const std::string& filename)
     return NULL;
     }
 
+  if(readAsDisplacement)
+  {
     DeformationFieldToHFieldImageFilter(itkImage);
+  }
 
   // Convert to VectorImageType and return
   return VectorImageUtils< T, VImageDimension >::convertFromITK(itkImage);
