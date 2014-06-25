@@ -373,7 +373,7 @@ void CImageManager< TFloat, VImageDimension >::WriteOutputsFromDataJSONConfigura
     LDDMMUtilsType::applyMap( map, originalImage, warpedImage );
 
     typedef VectorImageUtils< TFloat, VImageDimension > VectorImageUtilsType;
-    VectorImageUtilsType::writeFileITK( warpedImage, iter->fileName );
+    VectorImageUtilsType::writeImageITK( warpedImage, iter->fileName );
   }
 
 }
@@ -1268,7 +1268,7 @@ void CImageManager< TFloat, VImageDimension >::GetTransformsFromDataJSONConfigur
               displacementVectorName="DisplacementVector"+ss.str();
 
               std::string filepath = displacementVectorName+".mha";
-              VectorImageUtilsType::writeFileITK( map, filepath );
+              VectorImageUtilsType::writeMapITK( map, filepath, false ); //TODO : check if we can get the boolean value bWriteAsDisplacement from somewhere
               fileName[displacementVectornumber]=filepath;
               displacementVectornumber++;
 

@@ -663,7 +663,7 @@ CLongitudinalAtlasBuilder< TFloat, VImageDimension >::ComputeIndividualGrowthMod
           // apply the map
           LDDMMUtils< FloatType, VImageDimension >::applyMap( currentMap, currentImage, warpedImage );
           // now write it out
-          VectorImageUtilsType::writeFileITK( warpedImage, currentDatum.fileName );
+          VectorImageUtilsType::writeImageITK( warpedImage, currentDatum.fileName );
           }
 
         if ( m_WriteDesiredComputationsToFileWithoutComputation )
@@ -685,7 +685,7 @@ CLongitudinalAtlasBuilder< TFloat, VImageDimension >::ComputeIndividualGrowthMod
             // compute the map for this image
             typename VectorFieldType::ConstPointer currentMap = new VectorFieldType( plddmm->GetMapFromTo( individualSubjectData[ iS ].timePoint, desiredTimePoints[ iT ] ) );
             // now write it out
-            VectorImageUtilsType::writeFileITK( currentMap, mapFileName );
+            VectorImageUtilsType::writeMapITK( currentMap, mapFileName, false );
             }
 
           if ( m_WriteDesiredComputationsToFileWithoutComputation )
@@ -773,7 +773,7 @@ CLongitudinalAtlasBuilder< TFloat, VImageDimension >::ComputePopulationGrowthMod
         // create output for images here
         typename VectorImageType::ConstPointer currentImage = new VectorImageType( plddmm->GetSourceImage( populationGrowthModelData[ iI ].timePoint ) );
         // now write it out
-        VectorImageUtilsType::writeFileITK( currentImage, currentImageFileName );
+        VectorImageUtilsType::writeImageITK( currentImage, currentImageFileName );
         }
 
       if ( m_WriteDesiredComputationsToFileWithoutComputation )
@@ -814,7 +814,7 @@ CLongitudinalAtlasBuilder< TFloat, VImageDimension >::ComputePopulationGrowthMod
             {
             typename VectorFieldType::ConstPointer currentMap = new VectorFieldType( plddmm->GetMapFromTo( fromTimePoint, toTimePoint ) );
             // now write it out
-            VectorImageUtilsType::writeFileITK( currentMap, mapFileName );
+            VectorImageUtilsType::writeMapITK( currentMap, mapFileName, false );
             }
 
           if ( m_WriteDesiredComputationsToFileWithoutComputation )
@@ -840,7 +840,7 @@ CLongitudinalAtlasBuilder< TFloat, VImageDimension >::ComputePopulationGrowthMod
           {
           typename VectorFieldType::ConstPointer currentMap = new VectorFieldType( plddmm->GetMapFromTo( fromTimePoint, toTimePoint ) );
           // now write it out
-          VectorImageUtilsType::writeFileITK( currentMap, mapFileName );
+          VectorImageUtilsType::writeMapITK( currentMap, mapFileName, false );
           }
 
         if ( m_WriteDesiredComputationsToFileWithoutComputation )
@@ -939,7 +939,7 @@ CLongitudinalAtlasBuilder< TFloat, VImageDimension >::ComputeCrossSectionalAtlas
   if ( !m_WriteDesiredComputationsToFileWithoutComputation && !m_UsePrecomputedCrossSectionalAtlases )
   {
     typename VectorImageType::ConstPointer ptrAtlasImage = crossSectionalAtlasBuilderFullGradient->GetAtlasImage();
-    VectorImageUtilsType::writeFileITK( ptrAtlasImage, currentCrossSectionalAtlasFileName );
+    VectorImageUtilsType::writeImageITK( ptrAtlasImage, currentCrossSectionalAtlasFileName );
   }
 
   std::map< int, int > currentSubIndices;
@@ -969,7 +969,7 @@ CLongitudinalAtlasBuilder< TFloat, VImageDimension >::ComputeCrossSectionalAtlas
         // TODO: Also support atlas-builder which has atlas as target
         typename VectorFieldType::ConstPointer currentMap = new VectorFieldType( crossSectionalAtlasBuilderFullGradient->GetMapFromTo( 1.0, 0.0, iI ) );
         // subject-subindex (indices to closest measured images)
-        VectorImageUtilsType::writeFileITK( currentMap, currentMapFileName );
+        VectorImageUtilsType::writeMapITK( currentMap, currentMapFileName, false );
       }
 
       if ( m_WriteDesiredComputationsToFileWithoutComputation )

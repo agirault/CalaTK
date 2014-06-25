@@ -860,50 +860,50 @@ void CMetamorphosisAdjointGeodesicShootingObjectiveFunction< TState >::OutputSta
   std::string suffix = "-iter-"  + CreateIntegerString( uiIter, 3 ) + ".nrrd";
 
   // write out the kernel
-  VectorImageUtilsType::writeFileITK( this->m_ptrKernel->GetKernel(), outputPrefix + "Kernel" + CreateIntegerString( 0, 3 ) + suffix );
+  VectorImageUtilsType::writeImageITK( this->m_ptrKernel->GetKernel(), outputPrefix + "Kernel" + CreateIntegerString( 0, 3 ) + suffix );
 
   // write out the currently stored gradient
 
   if ( this->m_ptrGradient->StateContainsInitialImage() )
   {
     VectorImageType* ptrI0Gradient = this->m_ptrGradient->GetPointerToInitialImage();
-    VectorImageUtilsType::writeFileITK( ptrI0Gradient, outputPrefix + "I0Gradient" + CreateIntegerString( 0, 3 ) + suffix );
+    VectorImageUtilsType::writeImageITK( ptrI0Gradient, outputPrefix + "I0Gradient" + CreateIntegerString( 0, 3 ) + suffix );
   }
 
   VectorImageType* ptrP0Gradient = this->m_ptrGradient->GetPointerToInitialMomentum();
 
-  VectorImageUtilsType::writeFileITK( ptrP0Gradient, outputPrefix + "P0Gradient" + CreateIntegerString( 0, 3 ) + suffix );
+  VectorImageUtilsType::writeImageITK( ptrP0Gradient, outputPrefix + "P0Gradient" + CreateIntegerString( 0, 3 ) + suffix );
 
   for ( unsigned int iI = 0; iI < this->m_vecTimeDiscretization.size()-1; ++iI )
     {
     // initialize to 0
     ptrCurrentGradient->SetToConstant( 0 );
 
-    VectorImageUtilsType::writeFileITK( m_ptrI[iI], outputPrefix + "I" + CreateIntegerString( iI, 3 ) + suffix );
-    VectorImageUtilsType::writeFileITK( m_ptrP[iI], outputPrefix + "lam" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeImageITK( m_ptrI[iI], outputPrefix + "I" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeImageITK( m_ptrP[iI], outputPrefix + "lam" + CreateIntegerString( iI, 3 ) + suffix );
 
     for ( unsigned int iD = 0; iD<dim; ++iD )
       {
       VectorFieldUtilsType::computeCentralGradient( m_ptrI[ iI ], iD, m_ptrTmpField );
-      VectorImageUtilsType::writeFileITK( m_ptrTmpField, outputPrefix + "gradI" + CreateIntegerString( iI, 3 ) + suffix );
+      VectorImageUtilsType::writeMapITK( m_ptrTmpField, outputPrefix + "gradI" + CreateIntegerString( iI, 3 ) + suffix, false );
 
       VectorImageUtilsType::multiplyVectorByImageDimensionInPlace( m_ptrP[ iI ], iD, m_ptrTmpField );
-      VectorImageUtilsType::writeFileITK( m_ptrTmpField, outputPrefix + "lam_x_gradI" + CreateIntegerString( iI, 3 ) + suffix );
+      VectorImageUtilsType::writeMapITK( m_ptrTmpField, outputPrefix + "lam_x_gradI" + CreateIntegerString( iI, 3 ) + suffix, false );
 
       ptrCurrentGradient->AddCellwise( m_ptrTmpField );
       }
 
     this->m_ptrKernel->ConvolveWithKernel( ptrCurrentGradient );
 
-    VectorImageUtilsType::writeFileITK( ptrCurrentGradient, outputPrefix + "conv_lam_x_gradI" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeMapITK( ptrCurrentGradient, outputPrefix + "conv_lam_x_gradI" + CreateIntegerString( iI, 3 ) + suffix, false );
 
     // add v
     this->ComputeVelocity( m_ptrI[ iI ], m_ptrP[ iI ], m_ptrTmpField, m_ptrTmpFieldConv );
 
-    VectorImageUtilsType::writeFileITK( m_ptrTmpField, outputPrefix + "v" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeMapITK( m_ptrTmpField, outputPrefix + "v" + CreateIntegerString( iI, 3 ) + suffix, false );
 
     ptrCurrentGradient->AddCellwise( m_ptrTmpField );
-    VectorImageUtilsType::writeFileITK( ptrCurrentGradient, outputPrefix + "gradv" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeMapITK( ptrCurrentGradient, outputPrefix + "gradv" + CreateIntegerString( iI, 3 ) + suffix, false );
 
 #ifdef EXTREME_DEBUGGING
     VectorImageUtilsType::writeFileITK( tstLamI[iI], outputPrefix + "lamI" + CreateIntegerString( iI, 3) + suffix );

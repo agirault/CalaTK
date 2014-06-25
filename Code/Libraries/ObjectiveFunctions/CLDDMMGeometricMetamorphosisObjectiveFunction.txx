@@ -842,15 +842,15 @@ void CLDDMMGeometricMetamorphosisObjectiveFunction< TState >::OutputStateInforma
   ComputeImagesForward();
   std::string sGeometrRes = "geometRes-";
   typedef VectorImageUtils< T, TState::ImageDimension > VectorImageUtilsType;
-  VectorImageUtilsType::writeFileITK( ptrEstT1, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-Est-T1.nrrd" ) );
-  VectorImageUtilsType::writeFileITK( ptrEstT2, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-Est-T2.nrrd" ) );
-  VectorImageUtilsType::writeFileITK( ptrEstI1, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-Est-I1.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( ptrEstT1, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-Est-T1.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( ptrEstT2, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-Est-T2.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( ptrEstI1, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-Est-I1.nrrd" ) );
 
   // blurred images and masks
-  VectorImageUtilsType::writeFileITK( ptrI0, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-I0-saved-orig.nrrd" ) );
-  VectorImageUtilsType::writeFileITK( ptrI1, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-I1-saved-orig.nrrd" ) );
-  VectorImageUtilsType::writeFileITK( ptrT0, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-T0-saved-orig.nrrd" ) );
-  VectorImageUtilsType::writeFileITK( ptrT2, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-T2-saved-orig.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( ptrI0, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-I0-saved-orig.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( ptrI1, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-I1-saved-orig.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( ptrT0, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-T0-saved-orig.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( ptrT2, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-T2-saved-orig.nrrd" ) );
 
   // compute the mask contributions: (T2-1) and (IT(1)-1)
   ComputeInvertedMask( ptrT2, m_ptrT2M1 );
@@ -860,8 +860,8 @@ void CLDDMMGeometricMetamorphosisObjectiveFunction< TState >::OutputStateInforma
   ComputeCompositedImage( ptrI1, m_ptrEstT1M1, m_ptrT2M1, m_ptrI1Comp );
   ComputeCompositedImage( ptrEstI1, m_ptrEstT1M1, m_ptrT2M1, m_ptrEstI1Comp );
 
-  VectorImageUtilsType::writeFileITK( m_ptrI1Comp, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-I1-comp.nrrd" ) );
-  VectorImageUtilsType::writeFileITK( m_ptrEstI1Comp, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-Est-I1-comp.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( m_ptrI1Comp, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-I1-comp.nrrd" ) );
+  VectorImageUtilsType::writeImageITK( m_ptrEstI1Comp, outputPrefix + CreateNumberedFileName( sGeometrRes, uiIter, "-Est-I1-comp.nrrd" ) );
 }
 
 #endif

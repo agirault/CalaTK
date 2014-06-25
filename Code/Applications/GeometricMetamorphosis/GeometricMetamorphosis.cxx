@@ -108,20 +108,20 @@ int DoIt( int argc, char** argv )
 
   typename VectorImageType::Pointer ptrI0W1 = new VectorImageType( ptrI0Orig );
 
-  VectorImageUtilsType::writeFileITK( ptrMap1, sourceToTargetMap );
+  VectorImageUtilsType::writeMapITK( ptrMap1, sourceToTargetMap, bWriteAsDisplacement );
 
   // generating warped image (not always written out)
   LDDMMUtilsType::applyMap( ptrMap1, ptrI0Orig, ptrI0W1 );
 
   if ( warpedSourceImage.compare("None")!=0 )
     {
-    VectorImageUtilsType::writeFileITK( ptrI0W1, warpedSourceImage );
+    VectorImageUtilsType::writeImageITK( ptrI0W1, warpedSourceImage );
     }
 
   if ( initialMomentumImage.compare("None") !=0 )
   {
     const VectorImageType* ptrI0 = lddmm->GetInitialMomentum();
-    VectorImageUtilsType::writeFileITK( ptrI0, initialMomentumImage );
+    VectorImageUtilsType::writeImageITK( ptrI0, initialMomentumImage );
   }
 
   if ( bWriteDetailedResults )
@@ -134,14 +134,14 @@ int DoIt( int argc, char** argv )
     typename VectorFieldType::ConstPointer ptrMap2 = new VectorFieldType( lddmm->GetMap( 2.0 ) );
     typename VectorFieldType::ConstPointer ptrMapFT = new VectorFieldType( lddmm->GetMapFromTo( 1.0, 2.0 ) );
 
-    VectorImageUtilsType::writeFileITK( ptrIm, sDetailedResultFilePrefix + "-res-imOut.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrMap0, sDetailedResultFilePrefix + "-res-map0Out.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrMap1, sDetailedResultFilePrefix + "-res-map1Out.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrMap2, sDetailedResultFilePrefix + "-res-map2Out.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrMapFT, sDetailedResultFilePrefix + "-res-map12.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrIm, sDetailedResultFilePrefix + "-res-imOut.nrrd" );
+    VectorImageUtilsType::writeMapITK( ptrMap0, sDetailedResultFilePrefix + "-res-map0Out.nrrd", bWriteAsDisplacement );
+    VectorImageUtilsType::writeMapITK( ptrMap1, sDetailedResultFilePrefix + "-res-map1Out.nrrd", bWriteAsDisplacement );
+    VectorImageUtilsType::writeMapITK( ptrMap2, sDetailedResultFilePrefix + "-res-map2Out.nrrd", bWriteAsDisplacement );
+    VectorImageUtilsType::writeMapITK( ptrMapFT, sDetailedResultFilePrefix + "-res-map12.nrrd", bWriteAsDisplacement );
 
-    VectorImageUtilsType::writeFileITK( ptrT1, sDetailedResultFilePrefix + "-res-T1.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrT2, sDetailedResultFilePrefix + "-res-T2.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrT1, sDetailedResultFilePrefix + "-res-T1.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrT2, sDetailedResultFilePrefix + "-res-T2.nrrd" );
 
     // apply the map to the original images and output
 
@@ -151,14 +151,14 @@ int DoIt( int argc, char** argv )
     LDDMMUtilsType::applyMap( ptrMap1, ptrT0Orig, ptrT0W1 );
     LDDMMUtilsType::applyMap( ptrMap2, ptrT0Orig, ptrT0W2 );
 
-    VectorImageUtilsType::writeFileITK( ptrI0W1, sDetailedResultFilePrefix + "-res-orig-EstI1.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrT0W1, sDetailedResultFilePrefix + "-res-orig-EstT1.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrT0W2, sDetailedResultFilePrefix + "-res-orig-EstT2.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrI0W1, sDetailedResultFilePrefix + "-res-orig-EstI1.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrT0W1, sDetailedResultFilePrefix + "-res-orig-EstT1.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrT0W2, sDetailedResultFilePrefix + "-res-orig-EstT2.nrrd" );
 
-    VectorImageUtilsType::writeFileITK( ptrI0Orig, sDetailedResultFilePrefix + "-res-I0-orig.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrI1Orig, sDetailedResultFilePrefix + "-res-I1-orig.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrT0Orig, sDetailedResultFilePrefix + "-res-T0-orig.nrrd" );
-    VectorImageUtilsType::writeFileITK( ptrT1Orig, sDetailedResultFilePrefix + "-res-T1-orig.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrI0Orig, sDetailedResultFilePrefix + "-res-I0-orig.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrI1Orig, sDetailedResultFilePrefix + "-res-I1-orig.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrT0Orig, sDetailedResultFilePrefix + "-res-T0-orig.nrrd" );
+    VectorImageUtilsType::writeImageITK( ptrT1Orig, sDetailedResultFilePrefix + "-res-T1-orig.nrrd" );
     }
 
   return EXIT_SUCCESS;

@@ -160,6 +160,13 @@
           <description>If set, will use the full adjoint metamorphosis scheme instead of the simplied scheme. Currently not recommended (highly experimental).</description>
         </boolean>
 
+        <boolean>
+          <name>bWriteAsDisplacement</name>
+          <longflag>--writeAsDisplacement</longflag>
+          <default>false</default>
+          <description>If set, sourceToTargetMap will be converted to a physical displacement field. This option is available to be able to use the computed Map with other tools : since CalaTK does not use the space information internally (like the origin and the space direction) but only the spacing, the nrrd header of the Hfield computed without this option does not describe the correct position of the image.</description>
+        </boolean>
+
   </parameters>
   
 </executable>

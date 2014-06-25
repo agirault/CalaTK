@@ -181,7 +181,7 @@ void CAtlasFullGradientObjectiveFunction< TState >::ComputeGradient()
     for ( iter=this->m_VectorIndividualObjectiveFunctionPtrs.begin(); iter!=this->m_VectorIndividualObjectiveFunctionPtrs.end(); ++iter )
       {
         (*iter)->GetSourceImage( tmpImage, 1.0 );
-        VectorImageUtilsType::writeFileITK( tmpImage, CreateNumberedFileName( "sourceImage", it, ".nrrd" ));
+        VectorImageUtilsType::writeImageITK( tmpImage, CreateNumberedFileName( "sourceImage", it, ".nrrd" ));
         tmpImage->SubtractCellwise( this->m_ptrState->GetImageState() );
         // now multiply by -2/sigma^2, because we assume SSD for the similarity measure to build the atlas
         tmpImage->MultiplyByConstant( -2.0/(*iter)->GetSigmaSqr() );
@@ -206,7 +206,7 @@ void CAtlasFullGradientObjectiveFunction< TState >::OutputStateInformation( unsi
 
   VectorImageType* currentAtlasImage = this->m_ptrState->GetImageState();
   typedef VectorImageUtils< FloatType, TState::ImageDimension > VectorImageUtilsType;
-  VectorImageUtilsType::writeFileITK( currentAtlasImage, outputPrefix + "atlas" + suffix );
+  VectorImageUtilsType::writeImageITK( currentAtlasImage, outputPrefix + "atlas" + suffix );
 }
 
 #endif

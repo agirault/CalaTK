@@ -327,7 +327,7 @@ bool CStateInitialMomentum< TFloat, VImageDimension >::StateContainsInitialImage
 template < class TFloat, unsigned int VImageDimension >
 void CStateInitialMomentum< TFloat, VImageDimension >::WriteStateToFile( std::string prefix, std::string postfix, int offset )
 {
-  VectorImageUtils< TFloat, VImageDimension>::writeFileITK( m_ptrInitialMomentum, CreateNumberedFileName( prefix, offset, postfix ) );
+  VectorImageUtils< TFloat, VImageDimension>::writeImageITK( m_ptrInitialMomentum, CreateNumberedFileName( prefix, offset, postfix ) );
 }
 
 } // end namespace

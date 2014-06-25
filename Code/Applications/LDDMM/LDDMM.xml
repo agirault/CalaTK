@@ -7,7 +7,7 @@
     <version>1.0</version>
     <documentation-url></documentation-url>
     <license>Apache 2.0</license>
-    <contributor>The CALATK team</contributor>
+    <contributor>test</contributor>
     <acknowledgements></acknowledgements>
 
   <parameters>
@@ -168,6 +168,13 @@
             <element>4</element>
             <description>Sets the verbosity level for the algorithms that support multiple levels of output. Always (0), normal (1), verbose (2), very_verbose(3), most_verbose (4).</description>
         </integer-enumeration>
+
+        <boolean>
+          <name>bWriteAsDisplacement</name>
+          <longflag>--writeAsDisplacement</longflag>
+          <default>false</default>
+          <description>If set, sourceToTargetMap will be converted to a physical displacement field. This option is available to be able to use the computed Map with other tools : since CalaTK does not use the space information internally (like the origin and the space direction) but only the spacing, the nrrd header of the Hfield computed without this option does not describe the correct position of the image.</description>
+        </boolean>
 
   </parameters>
   
