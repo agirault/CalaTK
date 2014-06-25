@@ -52,7 +52,7 @@ int DoIt( int argc, char **argv )
 
   // write out the result
 
-  VectorImageUtilsType::writeFileITK( ptrImTarget, targetImage );
+  VectorImageUtilsType::writeImageITK( ptrImTarget, targetImage );
 
   return EXIT_SUCCESS;
 

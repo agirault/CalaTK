@@ -311,11 +311,11 @@ void CLDDMMGrowthModelObjectiveFunction< TState >::ComputeGradient()
       ptrCurrentGradient->AddCellwise( m_ptrTmpGradient );
       }
 
-    //VectorImageUtils< T, ImageDimension >::writeFileITK( ptrCurrentGradient, "curGradBeforeConv.nrrd" );
+    //VectorImageUtils< T, ImageDimension >::writeMapITK( ptrCurrentGradient, "curGradBeforeConv.nrrd", false );
 
     this->m_ptrKernel->ConvolveWithKernel( ptrCurrentGradient );
 
-    //VectorImageUtils< T, ImageDimension >::writeFileITK( ptrCurrentGradient, "curGradAfterConv.nrrd" );
+    //VectorImageUtils< T, ImageDimension >::writeMapITK( ptrCurrentGradient, "curGradAfterConv.nrrd", false );
 
     // add v
     VectorFieldType* ptrCurrentVelocity = this->m_ptrState->GetVectorFieldPointer( iI );
@@ -476,37 +476,37 @@ void CLDDMMGrowthModelObjectiveFunction< TState >::OutputStateInformation( unsig
   // write out the kernel
   typedef VectorImageUtils< T, TState::ImageDimension > VectorImageUtilsType;
   typedef VectorFieldUtils< T, TState::ImageDimension > VectorFieldUtilsType;
-  VectorImageUtilsType::writeFileITK( this->m_ptrKernel->GetKernel(), outputPrefix + "Kernel" + CreateIntegerString( 0, 3 ) + suffix );
+  VectorImageUtilsType::writeImageITK( this->m_ptrKernel->GetKernel(), outputPrefix + "Kernel" + CreateIntegerString( 0, 3 ) + suffix );
 
   for ( unsigned int iI = 0; iI < this->m_vecTimeDiscretization.size()-1; ++iI )
     {
     // initialize to 0
     ptrCurrentGradient->SetToConstant( 0 );
 
-    VectorImageUtilsType::writeFileITK( m_ptrI[iI], outputPrefix + "I" + CreateIntegerString( iI, 3 ) + suffix );
-    VectorImageUtilsType::writeFileITK( m_ptrLambda[iI], outputPrefix + "lam" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeImageITK( m_ptrI[iI], outputPrefix + "I" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeImageITK( m_ptrLambda[iI], outputPrefix + "lam" + CreateIntegerString( iI, 3 ) + suffix );
 
     for ( unsigned int iD = 0; iD<dim; ++iD )
       {
       VectorFieldUtilsType::computeCentralGradient( m_ptrI[ iI ], iD, m_ptrTmpGradient );
-      VectorImageUtilsType::writeFileITK( m_ptrTmpGradient, outputPrefix + "gradI" + CreateIntegerString( iI, 3 ) + suffix );
+      VectorImageUtilsType::writeMapITK( m_ptrTmpGradient, outputPrefix + "gradI" + CreateIntegerString( iI, 3 ) + suffix, false );
 
       VectorImageUtilsType::multiplyVectorByImageDimensionInPlace( m_ptrLambda[ iI ], iD, m_ptrTmpGradient );
-      VectorImageUtilsType::writeFileITK( m_ptrTmpGradient, outputPrefix + "lam_x_gradI" + CreateIntegerString( iI, 3 ) + suffix );
+      VectorImageUtilsType::writeMapITK( m_ptrTmpGradient, outputPrefix + "lam_x_gradI" + CreateIntegerString( iI, 3 ) + suffix, false );
 
       ptrCurrentGradient->AddCellwise( m_ptrTmpGradient );
       }
 
     this->m_ptrKernel->ConvolveWithKernel( ptrCurrentGradient );
 
-    VectorImageUtilsType::writeFileITK( ptrCurrentGradient, outputPrefix + "conv_lam_x_gradI" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeMapITK( ptrCurrentGradient, outputPrefix + "conv_lam_x_gradI" + CreateIntegerString( iI, 3 ) + suffix, false );
 
     // add v
     VectorFieldType* ptrCurrentVelocity = this->m_ptrState->GetVectorFieldPointer( iI );
-    VectorImageUtilsType::writeFileITK( ptrCurrentVelocity, outputPrefix + "v" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeMapITK( ptrCurrentVelocity, outputPrefix + "v" + CreateIntegerString( iI, 3 ) + suffix, false );
 
     ptrCurrentGradient->AddCellwise( ptrCurrentVelocity );
-    VectorImageUtilsType::writeFileITK( ptrCurrentGradient, outputPrefix + "gradv" + CreateIntegerString( iI, 3 ) + suffix );
+    VectorImageUtilsType::writeMapITK( ptrCurrentGradient, outputPrefix + "gradv" + CreateIntegerString( iI, 3 ) + suffix, false );
     }
 }
 

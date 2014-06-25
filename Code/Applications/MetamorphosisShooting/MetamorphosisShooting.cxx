@@ -137,13 +137,13 @@ int DoIt( int argc, char** argv )
     }
 
   typename VectorFieldType::Pointer ptrMap1 = new VectorFieldType( plddmm->GetMap( 1.0 ) );
-  VectorImageUtilsType::writeFileITK( ptrMap1, sourceToTargetMap );
+  VectorImageUtilsType::writeMapITK( ptrMap1, sourceToTargetMap, bWriteAsDisplacement );
 
   if ( warpedSourceImage.compare("None") != 0 )
     {
     typename VectorImageType::Pointer ptrI0W1 = new VectorImageType( plddmm->GetSourceImage( 1.0 ) );
     // generating warped image (not always written out)
-    VectorImageUtilsType::writeFileITK( ptrI0W1, warpedSourceImage );
+    VectorImageUtilsType::writeImageITK( ptrI0W1, warpedSourceImage );
     }
 
   if ( initialMomentumImage.compare("None") !=0 )
@@ -153,12 +153,12 @@ int DoIt( int argc, char** argv )
       if ( bIsSimplified )
       {
         const VectorImageType* ptrI0 = dynamic_cast< regTypeSimplifiedInitialImage* >( plddmm.GetPointer() )->GetInitialMomentum();
-        VectorImageUtilsType::writeFileITK( ptrI0, initialMomentumImage );
+        VectorImageUtilsType::writeImageITK( ptrI0, initialMomentumImage );
       }
       else
       {
         const VectorImageType* ptrI0 = dynamic_cast< regTypeFullInitialImage* >( plddmm.GetPointer() )->GetInitialMomentum();
-        VectorImageUtilsType::writeFileITK( ptrI0, initialMomentumImage );
+        VectorImageUtilsType::writeImageITK( ptrI0, initialMomentumImage );
       }
     }
     else
@@ -166,12 +166,12 @@ int DoIt( int argc, char** argv )
       if ( bIsSimplified )
       {
         const VectorImageType* ptrI0 = dynamic_cast< regTypeSimplified* >( plddmm.GetPointer() )->GetInitialMomentum();
-        VectorImageUtilsType::writeFileITK( ptrI0, initialMomentumImage );
+        VectorImageUtilsType::writeImageITK( ptrI0, initialMomentumImage );
       }
       else
       {
         const VectorImageType* ptrI0 = dynamic_cast< regTypeFull* >( plddmm.GetPointer() )->GetInitialMomentum();
-        VectorImageUtilsType::writeFileITK( ptrI0, initialMomentumImage );
+        VectorImageUtilsType::writeImageITK( ptrI0, initialMomentumImage );
       }
     }
   }

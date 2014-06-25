@@ -133,7 +133,7 @@ void CAtlasSubiterationUpdateObjectiveFunction< TState >::ComputeGradient()
       // weights are included in the gradient
       (*iter)->ComputeGradient();  // this automatically ends up in the gradient vector
 
-      VectorImageUtilsType::writeFileITK( (*iter)->GetGradientPointer()->GetPointerToInitialMomentum(), CreateNumberedFileName( "gradient", iI, ".nrrd" ));
+      VectorImageUtilsType::writeImageITK( (*iter)->GetGradientPointer()->GetPointerToInitialMomentum(), CreateNumberedFileName( "gradient", iI, ".nrrd" ));
 
       iI++;
     }

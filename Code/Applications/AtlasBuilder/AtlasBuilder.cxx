@@ -229,7 +229,7 @@ int DoIt( int argc, char** argv )
       ptrAtlasImage = atlasBuilderFullGradient->GetAtlasImage();
     }
 
-    VectorImageUtilsType::writeFileITK( ptrAtlasImage, atlasImage );
+    VectorImageUtilsType::writeImageITK( ptrAtlasImage, atlasImage );
   }
 
   return EXIT_SUCCESS;

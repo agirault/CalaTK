@@ -592,7 +592,7 @@ void CLDDMMSimplifiedGeodesicShootingObjectiveFunction< TState >::ComputeGradien
   ComputeImageMomentumForwardAndFinalAdjointWarpedToInitialImage( m_ptrWarpedFinalToInitialAdjoint );
 
   typedef VectorImageUtils< T, TState::ImageDimension > VectorImageUtilsType;
-  VectorImageUtilsType::writeFileITK( m_ptrWarpedFinalToInitialAdjoint, "finalATo0.nrrd" );
+  VectorImageUtilsType::writeImageITK( m_ptrWarpedFinalToInitialAdjoint, "finalATo0.nrrd" );
 
   /**
     * The gradient is now simply (and then multiplied by the global energy weight)
@@ -621,7 +621,7 @@ void CLDDMMSimplifiedGeodesicShootingObjectiveFunction< TState >::ComputeGradien
 
   ptrP0Gradient->AddCellwise( ptrInitialMomentum );
 
-  VectorImageUtilsType::writeFileITK( ptrInitialMomentum, "initialMomentum.nrrd" );
+  VectorImageUtilsType::writeImageITK( ptrInitialMomentum, "initialMomentum.nrrd" );
 
 
   if ( this->m_ptrState->StateContainsInitialImage() )
@@ -787,17 +787,17 @@ void CLDDMMSimplifiedGeodesicShootingObjectiveFunction< TState >::OutputStateInf
   std::string suffix = "-iter-" + CreateIntegerString( uiIter, 3 ) + ".nrrd";
 
   typedef VectorImageUtils< T, TState::ImageDimension > VectorImageUtilsType;
-  VectorImageUtilsType::writeFileITK( m_ptrWarpedFinalToInitialAdjoint, outputPrefix + "warpedLam" + suffix );
-  VectorImageUtilsType::writeFileITK( m_ptrCurrentFinalAdjoint, outputPrefix + "Lam1" + suffix );
-  VectorImageUtilsType::writeFileITK( m_ptrCurrentBackMap, outputPrefix + "backMap" + suffix );
-  VectorImageUtilsType::writeFileITK( m_ptrMapIn, outputPrefix + "fwdMap" + suffix );
-  VectorImageUtilsType::writeFileITK( ptrInitialMomentum, outputPrefix + "p0" + suffix );
-  VectorImageUtilsType::writeFileITK( ptrInitialImage, outputPrefix + "sI0" + suffix );
-  VectorImageUtilsType::writeFileITK( ptrP0Gradient, outputPrefix + "gradp0" + suffix );
-  VectorImageUtilsType::writeFileITK( ptrI0, outputPrefix + "I0" + suffix );
-  VectorImageUtilsType::writeFileITK( ptrI1, outputPrefix + "I1" + suffix );
-  VectorImageUtilsType::writeFileITK( m_ptrCurrentI, outputPrefix + "wI0" + suffix );
-  VectorImageUtilsType::writeFileITK( m_ptrCurrentP, outputPrefix + "wP0" + suffix );
+  VectorImageUtilsType::writeImageITK( m_ptrWarpedFinalToInitialAdjoint, outputPrefix + "warpedLam" + suffix );
+  VectorImageUtilsType::writeImageITK( m_ptrCurrentFinalAdjoint, outputPrefix + "Lam1" + suffix );
+  VectorImageUtilsType::writeMapITK( m_ptrCurrentBackMap, outputPrefix + "backMap" + suffix, false );
+  VectorImageUtilsType::writeMapITK( m_ptrMapIn, outputPrefix + "fwdMap" + suffix, false );
+  VectorImageUtilsType::writeImageITK( ptrInitialMomentum, outputPrefix + "p0" + suffix );
+  VectorImageUtilsType::writeImageITK( ptrInitialImage, outputPrefix + "sI0" + suffix );
+  VectorImageUtilsType::writeImageITK( ptrP0Gradient, outputPrefix + "gradp0" + suffix );
+  VectorImageUtilsType::writeImageITK( ptrI0, outputPrefix + "I0" + suffix );
+  VectorImageUtilsType::writeImageITK( ptrI1, outputPrefix + "I1" + suffix );
+  VectorImageUtilsType::writeImageITK( m_ptrCurrentI, outputPrefix + "wI0" + suffix );
+  VectorImageUtilsType::writeImageITK( m_ptrCurrentP, outputPrefix + "wP0" + suffix );
 
 }
 

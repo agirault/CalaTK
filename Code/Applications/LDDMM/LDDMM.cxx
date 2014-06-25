@@ -157,7 +157,7 @@ int DoIt( int argc, char** argv )
     }
 
   typename VectorFieldType::ConstPointer ptrMap1 = new VectorFieldType( plddmm->GetMap( 1.0 ) );
-  VectorImageUtilsType::writeFileITK( ptrMap1, sourceToTargetMap );
+  VectorImageUtilsType::writeMapITK( ptrMap1, sourceToTargetMap, bWriteAsDisplacement );
 
   if ( warpedSourceImage.compare("None") != 0 )
     {
@@ -165,7 +165,7 @@ int DoIt( int argc, char** argv )
     typename VectorImageType::Pointer ptrI0W1 = new VectorImageType( ptrI0Orig );
     // generating warped image (not always written out)
     LDDMMUtilsType::applyMap( ptrMap1, ptrI0Orig, ptrI0W1 );
-    VectorImageUtilsType::writeFileITK( ptrI0W1, warpedSourceImage );
+    VectorImageUtilsType::writeImageITK( ptrI0W1, warpedSourceImage );
     }
 
   if ( initialMomentumImage.compare("None") !=0 )
@@ -176,18 +176,18 @@ int DoIt( int argc, char** argv )
       if ( bStateContainsInitialImage )
       {
         ptrp0 = dynamic_cast< regTypeInitialImageMomentum* >( plddmm.GetPointer() )->GetInitialMomentum();
-        VectorImageUtilsType::writeFileITK( ptrp0, initialMomentumImage );
+        VectorImageUtilsType::writeImageITK( ptrp0, initialMomentumImage );
       }
       else
       {
         ptrp0 = dynamic_cast< regTypeInitialMomentum* >( plddmm.GetPointer() )->GetInitialMomentum();
-        VectorImageUtilsType::writeFileITK( ptrp0, initialMomentumImage );
+        VectorImageUtilsType::writeImageITK( ptrp0, initialMomentumImage );
       }
     }
     else if ( bIsSpatioTemporalVelocityType )
     {
       ptrp0 = dynamic_cast< regTypeSpatioTemporalVelocityField* >( plddmm.GetPointer() )->GetInitialMomentum();
-      VectorImageUtilsType::writeFileITK( ptrp0, initialMomentumImage );
+      VectorImageUtilsType::writeImageITK( ptrp0, initialMomentumImage );
     }
     else
     {
@@ -203,19 +203,18 @@ int DoIt( int argc, char** argv )
       if ( bStateContainsInitialImage )
       {
         ptrI0 = dynamic_cast< regTypeInitialImageMomentum* >( plddmm.GetPointer() )->GetSourceImage();
-        VectorImageUtilsType::writeFileITK( ptrI0, internalInitialImage );
+        VectorImageUtilsType::writeImageITK( ptrI0, internalInitialImage );
       }
       else
       {
-
         ptrI0 = dynamic_cast< regTypeInitialMomentum* >( plddmm.GetPointer() )->GetSourceImage();
-        VectorImageUtilsType::writeFileITK( ptrI0, internalInitialImage );
+        VectorImageUtilsType::writeImageITK( ptrI0, internalInitialImage );
       }
     }
     else if ( bIsSpatioTemporalVelocityType )
     {
       ptrI0 = dynamic_cast< regTypeSpatioTemporalVelocityField* >( plddmm.GetPointer() )->GetSourceImage();
-      VectorImageUtilsType::writeFileITK( ptrI0, internalInitialImage );
+      VectorImageUtilsType::writeImageITK( ptrI0, internalInitialImage );
     }
     else
     {
@@ -232,19 +231,18 @@ int DoIt( int argc, char** argv )
       if ( bStateContainsInitialImage )
       {
         ptrI0 = dynamic_cast< regTypeInitialImageMomentum* >( plddmm.GetPointer() )->GetTargetImage();
-        VectorImageUtilsType::writeFileITK( ptrI0, internalTargetImage );
+        VectorImageUtilsType::writeImageITK( ptrI0, internalTargetImage );
       }
       else
       {
-
         ptrI0 = dynamic_cast< regTypeInitialMomentum* >( plddmm.GetPointer() )->GetTargetImage();
-        VectorImageUtilsType::writeFileITK( ptrI0, internalTargetImage );
+        VectorImageUtilsType::writeImageITK( ptrI0, internalTargetImage );
       }
     }
     else if ( bIsSpatioTemporalVelocityType )
     {
       ptrI0 = dynamic_cast< regTypeSpatioTemporalVelocityField* >( plddmm.GetPointer() )->GetTargetImage();
-      VectorImageUtilsType::writeFileITK( ptrI0, internalTargetImage );
+      VectorImageUtilsType::writeImageITK( ptrI0, internalTargetImage );
     }
     else
     {
