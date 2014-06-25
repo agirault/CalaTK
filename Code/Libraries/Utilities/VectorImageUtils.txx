@@ -2422,325 +2422,308 @@ bool VectorImageUtils< T, VImageDimension >::writeTextFile(VectorImageType* im, 
 }
 
 //
-// writeFileITK, 1D
+// writeImageITK, 1D
 //
 template <class T, unsigned int VImageDimension >
-bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType1D* im, const std::string& filename, bool writeAsDisplacement)
+bool VectorImageUtils< T, VImageDimension >::writeImageITK(const VectorImageType1D* im, const std::string& filename)
 {
-  // Initialize ITK image
-  typename DeformationImageType::Pointer itkImage;
-  itkImage = VectorImageUtils<T,VImageDimension>::convertToITK(im);
-
-  if(writeAsDisplacement)
-  {
-      HFieldToDeformationFieldImageFilter(itkImage);
-  }
-
-  // Initialize ITK writer
-  typename itk::ImageFileWriter<DeformationImageType>::Pointer vectorImageWriter = itk::ImageFileWriter<DeformationImageType>::New();
-  vectorImageWriter->SetFileName(filename.c_str());
-  vectorImageWriter->SetInput(itkImage);
-  vectorImageWriter->UseCompressionOn();
-
-  // Try to write the image out
-  try
+    if (im->GetDimension() == 1)
     {
-    vectorImageWriter->Update();
-  }
-  catch( itk::ExceptionObject & err )
-    {
-    std::cerr << "VectorImage1DUtils::writeFileITK -> Writing Failed" << std::endl;
-    std::cerr << err << std::endl;
-    return false;
+        // Initialize ITK image
+        typename ITKImage<T,VImageDimension>::Type::Pointer itkImage;
+        itkImage = VectorImageUtils< T, VImageDimension >::convertDimToITK(im, 0);
+
+        // Initialize ITK writer
+        typename ITKImageWriter<T,VImageDimension>::Type::Pointer writer = ITKImageWriter<T,VImageDimension>::Type::New();
+        writer->SetFileName(filename.c_str());
+        writer->SetInput(itkImage);
+        writer->UseCompressionOn();
+
+        // Try to write the image out
+        try
+          {
+          writer->Update();
+          }
+        catch( itk::ExceptionObject & err )
+          {
+          std::cerr << "VectorImagUtils::writeImage1DITK -> Writing Failed" << std::endl;
+          std::cerr << err << std::endl;
+          return false;
+          }
+
+        return true;
     }
-
-  return true;
-}
-
-
-
-//
-// writeFileITK, 2D
-//
-template <class T, unsigned int VImageDimension >
-bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType2D* im, const std::string& filename, bool writeAsDisplacement)
-{
-
-  //
-  // If 1-channel and trying to write a char-type file, convert to grayscale uchar
-  //
-  if (im->GetDimension() == 1 &&
-      (ApplicationUtils::endsWith(filename, ".png") ||
-       ApplicationUtils::endsWith(filename, ".PNG") ||
-       ApplicationUtils::endsWith(filename, ".jpg") ||
-       ApplicationUtils::endsWith(filename, ".jpeg") ||
-       ApplicationUtils::endsWith(filename, ".JPG") ||
-       ApplicationUtils::endsWith(filename, ".JPEG")) )
+    else
     {
-
-    // Convert to Char
-    typename ITKCharImage2D::Pointer itkImage = VectorImageUtils::convertToITKChar(im);
-
-    // Initialize ITK writer
-    typename ITKCharImageWriter2D::Pointer imageWriter = ITKCharImageWriter2D::New();
-    imageWriter->SetFileName(filename.c_str());
-    imageWriter->SetInput(itkImage);
-    imageWriter->UseCompressionOn();
-
-    // Try to write the image out
-    try
-      {
-      imageWriter->Update();
-      }
-    catch( itk::ExceptionObject & err )
-      {
-      std::cerr << "VectorImage2DUtils::writeFileITK -> Writing Failed" << std::endl;
-      std::cerr << err << std::endl;
-      return false;
-      }
-    }
-
-  //
-  // If 3-channel and trying to write a char-type file, convert to RGB uchar
-  //
-  else if (im->GetDimension() == 3 &&
-           (ApplicationUtils::endsWith(filename, ".png") ||
-            ApplicationUtils::endsWith(filename, ".PNG") ||
-            ApplicationUtils::endsWith(filename, ".jpg") ||
-            ApplicationUtils::endsWith(filename, ".jpeg") ||
-            ApplicationUtils::endsWith(filename, ".JPG") ||
-            ApplicationUtils::endsWith(filename, ".JPEG")) )
-    {
-
-    typedef itk::RGBPixel<unsigned char> RGBPx;
-    typedef itk::Image< RGBPx, 2 > ColorImageType;
-    typedef itk::ImageFileWriter< ColorImageType > ColorWriterType;
-
-    //
-    // convert to ITK RGB image
-    //
-    unsigned int szX = im->GetSizeX();
-    unsigned int szY = im->GetSizeY();
-
-    // Initialize ITK image
-    typename ColorImageType::Pointer outImage;
-    outImage = ColorImageType::New();
-
-    // Set up region
-    typename ColorImageType::IndexType start;
-    start[0] = 0;
-    start[1] = 0;
-
-    typename ColorImageType::SizeType size;
-    size[0] = szX;
-    size[1] = szY;
-
-    typename ColorImageType::RegionType region;
-    region.SetSize(size);
-    region.SetIndex(start);
-
-    // Set up the spacing
-    typename ColorImageType::SpacingType space;
-    space[0] = im->GetSpacingX();
-    space[1] = im->GetSpacingY();
-    outImage->SetSpacing(space);
-
-    // Allocate region to image
-    outImage->SetRegions(region);
-    outImage->Allocate();
-
-    // normalize the image onto 0-255
-    typename VectorImageType::Pointer imNormalized = new VectorImageType( im );
-
-    typedef VectorImageUtils<T,2> VectorImageUtilsType;
-
-    VectorImageUtilsType::normalize(imNormalized, 0, 255);
-
-    // Copy in the data
-    for (unsigned int y = 0; y < szY; ++y)
-      {
-      for (unsigned int x = 0; x < szX; ++x)
-        {
-
-        typename ColorImageType::IndexType px;
-        px[0] = x;
-        px[1] = y;
-
-        RGBPx val;
-        val[0] = (unsigned char)imNormalized->GetValue(x,y,0);
-        val[1] = (unsigned char)imNormalized->GetValue(x,y,1);
-        val[2] = (unsigned char)imNormalized->GetValue(x,y,2);
-
-        outImage->SetPixel(px, val);
-        }
-      }
-
-    // Set origin and direction
-
-    std::cout << "WARNING: needs to be put back in." << std::endl;
-
-    outImage->SetOrigin(VectorImageUtilsType::convertITKVectorOrigin(im->GetOrigin()));
-    outImage->SetDirection(VectorImageUtilsType::convertITKVectorDirection(im->GetDirection()));
-
-    // Initialize ITK writer
-    typename ColorWriterType::Pointer colorImageWriter = ColorWriterType::New();
-    colorImageWriter->SetFileName(filename.c_str());
-    colorImageWriter->SetInput(outImage);
-    colorImageWriter->UseCompressionOn();
-
-    // Try to write the image out
-    try
-      {
-      colorImageWriter->Update();
-      }
-    catch( itk::ExceptionObject & err )
-      {
-      std::cerr << "VectorImage2DUtils::writeFileITK -> Writing Failed" << std::endl;
-      std::cerr << err << std::endl;
-      return false;
-    }
-
-  }
-
-  //
-  // If single vector dimension, compress to a 2D scalar image
-  //
-  else if (im->GetDimension() == 1)
-  {
-
-      // Initialize ITK image
-      typename ITKImage<T,VImageDimension>::Type::Pointer itkImage;
-      itkImage = VectorImageUtils< T, VImageDimension >::convertDimToITK(im, 0);
-
-      // Initialize ITK writer
-      typename ITKImageWriter<T,VImageDimension>::Type::Pointer writer = ITKImageWriter<T,VImageDimension>::Type::New();
-      writer->SetFileName(filename.c_str());
-      writer->SetInput(itkImage);
-      writer->UseCompressionOn();
-
-      // Try to write the image out
-      try
-        {
-        writer->Update();
-        }
-      catch( itk::ExceptionObject & err )
-        {
-        std::cerr << "VectorImage2DUtils::writeFileITK -> Writing Failed" << std::endl;
-        std::cerr << err << std::endl;
+        std::cerr << "VectorImageUtils::writeImage1DITK -> Writing Failed" << std::endl;
+        std::cerr << "Output does not seem to be an Image." << std::endl;
         return false;
-        }
-  }
-
-  //
-  // If all other conditions fail, just do the normal writing procedure
-  //
-  else
-  {
-
-    // Initialize ITK image
-    typename DeformationImageType::Pointer itkImage;
-    itkImage = VectorImageUtils< T, VImageDimension >::convertToITK(im);
-
-    if(writeAsDisplacement)
-    {
-        HFieldToDeformationFieldImageFilter(itkImage);
     }
-
-    // Initialize ITK writer
-    typename itk::ImageFileWriter<DeformationImageType>::Pointer vectorImageWriter = itk::ImageFileWriter<DeformationImageType>::New();
-    vectorImageWriter->SetFileName(filename.c_str());
-    vectorImageWriter->SetInput(itkImage);
-    vectorImageWriter->UseCompressionOn();
-
-    // Try to write the image out
-    try
-      {
-      vectorImageWriter->Update();
-      }
-    catch( itk::ExceptionObject & err )
-      {
-      std::cerr << "VectorImage2DUtils::writeFileITK -> Writing Failed" << std::endl;
-      std::cerr << err << std::endl;
-      return false;
-      }
-  }
-
-  return true;
 }
 
-
 //
-// writeFileITK, 3D
+// writeImageITK, 2D
 //
 template <class T, unsigned int VImageDimension >
-bool VectorImageUtils< T, VImageDimension >::writeFileITK( const VectorImageType3D* im, const std::string& filename, bool writeAsDisplacement)
+bool VectorImageUtils< T, VImageDimension >::writeImageITK(const VectorImageType2D* im, const std::string& filename)
 {
 
-  //
-  // If vector dim = 1, compress to a scalar 3D image
-  //
-  if (im->GetDimension() == 1)
+    //
+    // If trying to write a char-type file
+    //
+    if (ApplicationUtils::endsWith(filename, ".png")    ||
+        ApplicationUtils::endsWith(filename, ".PNG")    ||
+        ApplicationUtils::endsWith(filename, ".jpg")    ||
+        ApplicationUtils::endsWith(filename, ".jpeg")   ||
+        ApplicationUtils::endsWith(filename, ".JPG")    ||
+        ApplicationUtils::endsWith(filename, ".JPEG")   )
     {
+        //
+        // If 1-channel, convert to grayscale uchar
+        //
+        if(im->GetDimension() == 1)
+        {
+            // Convert to Char
+            typename ITKCharImage2D::Pointer itkImage = VectorImageUtils::convertToITKChar(im);
 
-    // Initialize ITK image
-    typename ITKImage<T,VImageDimension>::Type::Pointer itkImage;
-    itkImage = VectorImageUtils< T, VImageDimension >::convertDimToITK(im, 0);
+            // Initialize ITK writer
+            typename ITKCharImageWriter2D::Pointer imageWriter = ITKCharImageWriter2D::New();
+            imageWriter->SetFileName(filename.c_str());
+            imageWriter->SetInput(itkImage);
+            imageWriter->UseCompressionOn();
 
-    // Initialize ITK writer
-    typename ITKImageWriter<T,VImageDimension>::Type::Pointer writer = ITKImageWriter<T,VImageDimension>::Type::New();
-    writer->SetFileName(filename.c_str());
-    writer->SetInput(itkImage);
-    writer->UseCompressionOn();
+            // Try to write the image out
+            try
+            {
+                imageWriter->Update();
+            }
+            catch( itk::ExceptionObject & err )
+            {
+                std::cerr << "VectorImageUtils::writeImage2DITK -> Writing Failed" << std::endl;
+                std::cerr << err << std::endl;
+                return false;
+            }
+            return true;
+        }
 
-    // Try to write the image out
-    try
-      {
-      writer->Update();
-      }
-    catch( itk::ExceptionObject & err )
-      {
-      std::cerr << "VectorImag3DUtils::writeFileITK -> Writing Failed" << std::endl;
-      std::cerr << err << std::endl;
-      return false;
-      }
+        //
+        // If 3-channel, convert to RGB uchar
+        //
+        else if(im->GetDimension() == 3)
+        {
+            typedef itk::RGBPixel<unsigned char> RGBPx;
+            typedef itk::Image< RGBPx, 2 > ColorImageType;
+            typedef itk::ImageFileWriter< ColorImageType > ColorWriterType;
+
+            //
+            // convert to ITK RGB image
+            //
+            unsigned int szX = im->GetSizeX();
+            unsigned int szY = im->GetSizeY();
+
+            // Initialize ITK image
+            typename ColorImageType::Pointer outImage;
+            outImage = ColorImageType::New();
+
+            // Set up region
+            typename ColorImageType::IndexType start;
+            start[0] = 0;
+            start[1] = 0;
+
+            typename ColorImageType::SizeType size;
+            size[0] = szX;
+            size[1] = szY;
+
+            typename ColorImageType::RegionType region;
+            region.SetSize(size);
+            region.SetIndex(start);
+
+            // Set up the spacing
+            typename ColorImageType::SpacingType space;
+            space[0] = im->GetSpacingX();
+            space[1] = im->GetSpacingY();
+            outImage->SetSpacing(space);
+
+            // Allocate region to image
+            outImage->SetRegions(region);
+            outImage->Allocate();
+
+            // normalize the image onto 0-255
+            typename VectorImageType::Pointer imNormalized = new VectorImageType( im );
+
+            typedef VectorImageUtils<T,2> VectorImageUtilsType;
+
+            VectorImageUtilsType::normalize(imNormalized, 0, 255);
+
+            // Copy in the data
+            for (unsigned int y = 0; y < szY; ++y)
+            {
+                for (unsigned int x = 0; x < szX; ++x)
+                {
+
+                    typename ColorImageType::IndexType px;
+                    px[0] = x;
+                    px[1] = y;
+
+                    RGBPx val;
+                    val[0] = (unsigned char)imNormalized->GetValue(x,y,0);
+                    val[1] = (unsigned char)imNormalized->GetValue(x,y,1);
+                    val[2] = (unsigned char)imNormalized->GetValue(x,y,2);
+
+                    outImage->SetPixel(px, val);
+                }
+            }
+
+            // Set origin and direction
+
+            std::cout << "WARNING: needs to be put back in." << std::endl;
+
+            outImage->SetOrigin(VectorImageUtilsType::convertITKVectorOrigin(im->GetOrigin()));
+            outImage->SetDirection(VectorImageUtilsType::convertITKVectorDirection(im->GetDirection()));
+
+            // Initialize ITK writer
+            typename ColorWriterType::Pointer colorImageWriter = ColorWriterType::New();
+            colorImageWriter->SetFileName(filename.c_str());
+            colorImageWriter->SetInput(outImage);
+            colorImageWriter->UseCompressionOn();
+
+            // Try to write the image out
+            try
+            {
+                colorImageWriter->Update();
+            }
+            catch( itk::ExceptionObject & err )
+            {
+                std::cerr << "VectorImageUtils::writeImage2DITK -> Writing Failed" << std::endl;
+                std::cerr << err << std::endl;
+                return false;
+            }
+            return true;
+        }
     }
 
-  //
-  // Otherwise, just write out as a 4D image
-  //
-  else
+    //
+    // If single vector dimension, compress to a 2D scalar image
+    //
+    else if (im->GetDimension() == 1)
     {
- 
-    // Initialize ITK image
-    typename DeformationImageType::Pointer itkImage;
-    itkImage = VectorImageUtils< T, VImageDimension >::convertToITK(im);
+        // Initialize ITK image
+        typename ITKImage<T,VImageDimension>::Type::Pointer itkImage;
+        itkImage = VectorImageUtils< T, VImageDimension >::convertDimToITK(im, 0);
 
-    if(writeAsDisplacement)
+        // Initialize ITK writer
+        typename ITKImageWriter<T,VImageDimension>::Type::Pointer writer = ITKImageWriter<T,VImageDimension>::Type::New();
+        writer->SetFileName(filename.c_str());
+        writer->SetInput(itkImage);
+        writer->UseCompressionOn();
+
+        // Try to write the image out
+        try
+        {
+            writer->Update();
+        }
+        catch( itk::ExceptionObject & err )
+        {
+            std::cerr << "VectorImageUtils::writeImage2DITK -> Writing Failed" << std::endl;
+            std::cerr << err << std::endl;
+            return false;
+        }
+        return true;
+    }
+    else
     {
-        HFieldToDeformationFieldImageFilter(itkImage);
+        std::cerr << "VectorImageUtils::writeImage2DITK -> Writing Failed" << std::endl;
+        std::cerr << "Output does not seem to be a Deformation Field." << std::endl;
+        return false;
     }
-
-    // Initialize ITK writer
-    typename itk::ImageFileWriter<DeformationImageType>::Pointer writer = itk::ImageFileWriter<DeformationImageType>::New();
-    writer->SetFileName(filename.c_str());
-    writer->SetInput(itkImage);
-    writer->UseCompressionOn();
-
-    // Try to write the image out
-    try
-      {
-      writer->Update();
-      }
-    catch( itk::ExceptionObject & err )
-      {
-      std::cerr << "VectorImag3DUtils::writeFileITK -> Writing Failed" << std::endl;
-      std::cerr << err << std::endl;
-      return false;
-      }
-    }
-
-  return true;
 }
+
+//
+// writeImageITK, 3D
+//
+template <class T, unsigned int VImageDimension >
+bool VectorImageUtils< T, VImageDimension >::writeImageITK( const VectorImageType3D* im, const std::string& filename)
+{
+    if (im->GetDimension() == 1)
+    {
+        // Initialize ITK image
+        typename ITKImage<T,VImageDimension>::Type::Pointer itkImage;
+        itkImage = VectorImageUtils< T, VImageDimension >::convertDimToITK(im, 0);
+
+        // Initialize ITK writer
+        typename ITKImageWriter<T,VImageDimension>::Type::Pointer writer = ITKImageWriter<T,VImageDimension>::Type::New();
+        writer->SetFileName(filename.c_str());
+        writer->SetInput(itkImage);
+        writer->UseCompressionOn();
+
+        // Try to write the image out
+        try
+          {
+          writer->Update();
+          }
+        catch( itk::ExceptionObject & err )
+          {
+          std::cerr << "VectorImageUtils::writeImag3DITK -> Writing Failed" << std::endl;
+          std::cerr << err << std::endl;
+          return false;
+          }
+
+        return true;
+    }
+    else
+    {
+        std::cerr << "VectorImageUtils::writeImage3DITK -> Writing Failed" << std::endl;
+        std::cerr << "Output does not seem to be an Image." << std::endl;
+        return false;
+    }
+}
+
+
+//
+// writeMapITK
+//
+template <class T, unsigned int VImageDimension >
+bool VectorImageUtils< T, VImageDimension >::writeMapITK(const VectorImageType* im, const std::string& filename, bool writeAsDisplacement)
+{
+    if (im->GetDimension() == VImageDimension)
+    {
+        // Initialize ITK image
+        typename DeformationImageType::Pointer itkImage;
+        itkImage = VectorImageUtils<T,VImageDimension>::convertToITK(im);
+
+        if(writeAsDisplacement)
+        {
+            HFieldToDeformationFieldImageFilter(itkImage);
+        }
+
+        // Initialize ITK writer
+        typename itk::ImageFileWriter<DeformationImageType>::Pointer vectorImageWriter = itk::ImageFileWriter<DeformationImageType>::New();
+        vectorImageWriter->SetFileName(filename.c_str());
+        vectorImageWriter->SetInput(itkImage);
+        vectorImageWriter->UseCompressionOn();
+
+        // Try to write the image out
+        try
+        {
+            vectorImageWriter->Update();
+        }
+        catch( itk::ExceptionObject & err )
+        {
+            std::cerr << "VectorImageUtils::writeMapITK -> Writing Failed" << std::endl;
+            std::cerr << err << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+    else
+    {
+        std::cerr << "VectorImageUtils::writeMapITK -> Writing Failed " << std::endl;
+        std::cerr << "Output does not seem to be a DeformationField."<< std::endl;
+        return false;
+    }
+}
+
 
 
 //

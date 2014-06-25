@@ -583,7 +583,7 @@ public:
    * @param im - the image to write
    * @param filename - the name of the file to write to
    */
-  static bool writeFileITK(const VectorImageType1D* im, const std::string& filename, bool writeAsDisplacement);
+  static bool writeImageITK(const VectorImageType1D* im, const std::string& filename);
 
   /**
    * 2D Method that uses ITK to write the image out
@@ -591,7 +591,7 @@ public:
    * @param im - the image to write
    * @param filename - the name of the file to write to
    */
-  static bool writeFileITK(const VectorImageType2D* im, const std::string& filename, bool writeAsDisplacement);
+  static bool writeImageITK(const VectorImageType2D* im, const std::string& filename);
 
   /**
    * 3D Method that uses ITK to write the image out
@@ -599,7 +599,15 @@ public:
    * @param im - the image to write
    * @param filename - the name of the file to write to
    */
-  static bool writeFileITK(const VectorImageType3D* im, const std::string& filename, bool writeAsDisplacement);
+  static bool writeImageITK(const VectorImageType3D* im, const std::string& filename);
+
+  /**
+   * Method that uses ITK to write a SourceToTargetMap out
+   *
+   * @param im - the map to write
+   * @param filename - the name of the file to write to
+   */
+  static bool writeMapITK(const VectorImageType* im, const std::string& filename, bool writeAsDisplacement);
 
   /**
    * 2D Method that uses ITK to write the time dependant image set out
