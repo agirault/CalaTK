@@ -166,7 +166,7 @@ public:
    * @param pos - an image with 3 vector dimensions. (one for x positions, one for y positions,
    *     one for z position)
    * @param imOut - return parameter for interpolated image
-   * @param uiNrOfThreads -- number of threads used
+   * @param uiNrOfThis -- number of threads used
    */
   static void interpolate( const VectorImageType1D* imIn, const VectorImageType1D* pos, VectorImageType1D* imOut, unsigned int uiNrOfThreads = 1 );
 
@@ -642,12 +642,19 @@ public:
   static bool writeTimeDependantImagesITK( const std::vector< VectorImageType* >* ims, const std::string& filename);
 
   /**
-   * Method that uses ITK to read a file in
+   * Method that uses ITK to read an image in a file
    *
-   * @param filename - the name of the file to write to
+   * @param filename - the name of the file to read from
    */
-  static VectorImageType* readMapITK(const std::string& filename);
   static VectorImageType* readImageITK(const std::string& filename);
+
+  /**
+   * Method that uses ITK to read an image in a file
+   *
+   * @param filename - the name of the read from
+   * @param readAsDisplacement - the bool value indicating if a conversion is needed
+   */
+  static VectorImageType* readMapITK(const std::string& filename, bool readAsDisplacement);
 
   /**
    * Method that reads an ITK affine transform from a file

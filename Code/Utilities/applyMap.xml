@@ -38,6 +38,13 @@
             <description>Warped source image (subject to the map).</description>
         </image>
 
+        <boolean>
+          <name>bReadAsDisplacement</name>
+          <longflag>--readAsDisplacement</longflag>
+          <default>false</default>
+          <description>If set, sourceToTargetMap will be converted from a physical displacement field to a Hfield using only the spacing. Needs to be use when "writeAsDisplacement" was used when computing the Map.</description>
+        </boolean>
+
   </parameters>
   
 </executable>
