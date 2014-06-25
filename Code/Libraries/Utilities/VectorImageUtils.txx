@@ -2425,11 +2425,16 @@ bool VectorImageUtils< T, VImageDimension >::writeTextFile(VectorImageType* im, 
 // writeFileITK, 1D
 //
 template <class T, unsigned int VImageDimension >
-bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType1D* im, const std::string& filename)
+bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType1D* im, const std::string& filename, bool writeAsDisplacement)
 {
   // Initialize ITK image
   typename DeformationImageType::Pointer itkImage;
   itkImage = VectorImageUtils<T,VImageDimension>::convertToITK(im);
+
+  if(writeAsDisplacement)
+  {
+      HFieldToDeformationFieldImageFilter(itkImage);
+  }
 
   // Initialize ITK writer
   typename itk::ImageFileWriter<DeformationImageType>::Pointer vectorImageWriter = itk::ImageFileWriter<DeformationImageType>::New();
@@ -2444,7 +2449,7 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType1
   }
   catch( itk::ExceptionObject & err )
     {
-    std::cerr << "VectorImage2DUtils::writeFileITK -> Writing Failed" << std::endl;
+    std::cerr << "VectorImage1DUtils::writeFileITK -> Writing Failed" << std::endl;
     std::cerr << err << std::endl;
     return false;
     }
@@ -2458,7 +2463,7 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType1
 // writeFileITK, 2D
 //
 template <class T, unsigned int VImageDimension >
-bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType2D* im, const std::string& filename)
+bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType2D* im, const std::string& filename, bool writeAsDisplacement)
 {
 
   //
@@ -2600,67 +2605,46 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType2
   //
   // If single vector dimension, compress to a 2D scalar image
   //
-  else if (im->GetDimension() == 1) {
+  else if (im->GetDimension() == 1)
+  {
 
-/*
-    // Get image information
-    unsigned int szX = im->GetSizeX();
-    unsigned int szY = im->GetSizeY();
-    // Set up output image
-    ITKImage2D::Pointer outVecIm = ITKImage2D::New();
-    ITKImage2D::RegionType region;
-    ITKImage2D::SizeType size;
-    ITKImage2D::IndexType start;
-    ITKImage2D::SpacingType spacing;
-    size[0] = szX;
-    size[1] = szY;
-    start.Fill(0);
-    region.SetSize(size);
-    region.SetIndex(start);
-    spacing[0] = im->GetSpacingX();
-    spacing[1] = im->GetSpacingY();
-    outVecIm->SetRegions(region);
-    outVecIm->SetSpacing(spacing);
-    outVecIm->SetOrigin(convertITKVectorOriginTo2D(im->GetOrigin()));
-    outVecIm->SetDirection(convertITKVectorDirectionTo2D(im->GetDirection()));
-    outVecIm->Allocate();
+      // Initialize ITK image
+      typename ITKImage<T,VImageDimension>::Type::Pointer itkImage;
+      itkImage = VectorImageUtils< T, VImageDimension >::convertDimToITK(im, 0);
 
-    // Copy the data
-    for (unsigned int y = 0; y < szY; ++y) {
-      for (unsigned int x = 0; x < szX; ++x) {
-        ITKImage2D::IndexType idx = {{x,y}};
-        outVecIm->SetPixel(idx, im->GetValue(x,y,0));
-      }
-    }
-*/
-  typename ITKImage<T,VImageDimension>::Type::Pointer scalarIm = convertDimToITK(im, 0);
+      // Initialize ITK writer
+      typename ITKImageWriter<T,VImageDimension>::Type::Pointer writer = ITKImageWriter<T,VImageDimension>::Type::New();
+      writer->SetFileName(filename.c_str());
+      writer->SetInput(itkImage);
+      writer->UseCompressionOn();
 
-  // Write out the image
-  typename ITKImageWriter<T,VImageDimension>::Type::Pointer writer = ITKImageWriter<T,VImageDimension>::Type::New();
-  writer->SetInput(scalarIm);
-  writer->SetFileName(filename);
-  writer->UseCompressionOn();
-  try {
-  writer->Update();
-  }
-  catch( itk::ExceptionObject & err )
-    {
-    std::cerr << "VectorImage2DUtils::writeFileITK -> Writing Failed" << std::endl;
-    std::cerr << err << std::endl;
-    return false;
-    }
-
+      // Try to write the image out
+      try
+        {
+        writer->Update();
+        }
+      catch( itk::ExceptionObject & err )
+        {
+        std::cerr << "VectorImage2DUtils::writeFileITK -> Writing Failed" << std::endl;
+        std::cerr << err << std::endl;
+        return false;
+        }
   }
 
   //
   // If all other conditions fail, just do the normal writing procedure
   //
   else
-    {
+  {
 
     // Initialize ITK image
     typename DeformationImageType::Pointer itkImage;
     itkImage = VectorImageUtils< T, VImageDimension >::convertToITK(im);
+
+    if(writeAsDisplacement)
+    {
+        HFieldToDeformationFieldImageFilter(itkImage);
+    }
 
     // Initialize ITK writer
     typename itk::ImageFileWriter<DeformationImageType>::Pointer vectorImageWriter = itk::ImageFileWriter<DeformationImageType>::New();
@@ -2679,7 +2663,7 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType2
       std::cerr << err << std::endl;
       return false;
       }
-    }
+  }
 
   return true;
 }
@@ -2689,7 +2673,7 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK(const VectorImageType2
 // writeFileITK, 3D
 //
 template <class T, unsigned int VImageDimension >
-bool VectorImageUtils< T, VImageDimension >::writeFileITK( const VectorImageType3D* im, const std::string& filename)
+bool VectorImageUtils< T, VImageDimension >::writeFileITK( const VectorImageType3D* im, const std::string& filename, bool writeAsDisplacement)
 {
 
   //
@@ -2715,7 +2699,7 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK( const VectorImageType
       }
     catch( itk::ExceptionObject & err )
       {
-      std::cerr << "VectorImageUtils< T, VImageDimension >::writeFileITK -> Writing Failed" << std::endl;
+      std::cerr << "VectorImag3DUtils::writeFileITK -> Writing Failed" << std::endl;
       std::cerr << err << std::endl;
       return false;
       }
@@ -2731,7 +2715,10 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK( const VectorImageType
     typename DeformationImageType::Pointer itkImage;
     itkImage = VectorImageUtils< T, VImageDimension >::convertToITK(im);
 
-    HFieldToDeformationFieldImageFilter(itkImage);
+    if(writeAsDisplacement)
+    {
+        HFieldToDeformationFieldImageFilter(itkImage);
+    }
 
     // Initialize ITK writer
     typename itk::ImageFileWriter<DeformationImageType>::Pointer writer = itk::ImageFileWriter<DeformationImageType>::New();
@@ -2746,7 +2733,7 @@ bool VectorImageUtils< T, VImageDimension >::writeFileITK( const VectorImageType
       }
     catch( itk::ExceptionObject & err )
       {
-      std::cerr << "VectorImageUtils< T, VImageDimension >::writeFileITK -> Writing Failed" << std::endl;
+      std::cerr << "VectorImag3DUtils::writeFileITK -> Writing Failed" << std::endl;
       std::cerr << err << std::endl;
       return false;
       }
