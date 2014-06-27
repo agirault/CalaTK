@@ -64,7 +64,9 @@ int main( int argc, char **argv)
 
   unsigned int uiSourceImageDimension = CALATK::GetNonSingletonImageDimensionFromFile( sourceImage );
 
-  std::cout << "Image dimension = " << uiSourceImageDimension << std::endl;
+  //std::cout << "Image dimension = " << uiSourceImageDimension << std::endl;
+
+  CALATK::CheckIfSameHeader(sourceImage, sourceToTargetMap, uiSourceImageDimension);
 
   switch ( uiSourceImageDimension )
     {
