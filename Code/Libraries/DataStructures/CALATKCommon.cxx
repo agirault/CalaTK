@@ -131,6 +131,8 @@ void CheckIfSameHeader(const std::string & imageOrig1, const std::string & image
     image2->SetFileName( imageName2.c_str() );
     image2->ReadImageInformation();
 
+    const double diffMax = 1.0e-6; // TODO : modify value if too strict (we have experienced diff of 1.0e-8 for spacing)
+
     for ( unsigned int iI=0; iI<uiDim; ++iI )
     {
         itk::SizeValueType dim1 = image1->GetDimensions( iI );
@@ -146,14 +148,15 @@ void CheckIfSameHeader(const std::string & imageOrig1, const std::string & image
         std::vector<double> dir2 = image2->GetDirection( iI );
         if (dir1 != dir2)
         {
-            std::cout << imageOrig1 << " : spaceDirection(" << iI << ") = " << dir1 << std::endl;
-            std::cout << imageOrig2 << " : spaceDirection(" << iI << ") = " << dir2 << std::endl;
+            std::cout << imageOrig1 << " : spaceDirection(" << iI << ") = " << dir1;
+            std::cout << imageOrig2 << " : spaceDirection(" << iI << ") = " << dir2;
             throw std::runtime_error("Images space direction do not match ");
         }
 
         double spacing1 = image1->GetSpacing( iI );
         double spacing2 = image2->GetSpacing( iI );
-        if (spacing1 != spacing2)
+        double diffSpacing = std::abs(1-(spacing1/spacing2));
+        if (diffSpacing > diffMax)
         {
             std::cout << imageOrig1 << " : spacing(" << iI << ") = " << spacing1 << std::endl;
             std::cout << imageOrig2 << " : spacing(" << iI << ") = " << spacing2 << std::endl;
