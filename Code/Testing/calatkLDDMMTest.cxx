@@ -115,11 +115,11 @@ int DoIt(std::string LDDMMType, const char* sourceImage, const char* targetImage
 
   // generating map
   // const typename VectorFieldType::Pointer ptrMap1 = new VectorFieldType( plddmm->GetMap( 1.0 ) );
-  // VectorImageUtilsType::writeFileITK( ptrMap1, resultImage );
+  // VectorImageUtilsType::writeMapITK( ptrMap1, resultImage, false );
 
   const typename VectorImageType::Pointer ptrI0W1 = new VectorImageType( plddmm->GetSourceImage( 1.0 ) );
   // generating warped image
-  VectorImageUtilsType::writeFileITK( ptrI0W1, resultImage );
+  VectorImageUtilsType::writeImageITK( ptrI0W1, resultImage );
 
   return EXIT_SUCCESS;
 }

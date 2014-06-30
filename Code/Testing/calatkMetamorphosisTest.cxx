@@ -98,11 +98,11 @@ int DoIt( std::string MetamorphosisType, char* sourceImage, char* targetImage, c
 
   // generating map
   const typename VectorFieldType::Pointer ptrMap1 = new VectorFieldType( plddmm->GetMap( 1.0 ) );
-  VectorImageUtilsType::writeFileITK( ptrMap1, filename );
+  VectorImageUtilsType::writeMapITK( ptrMap1, filename, false );
 
   const typename VectorImageType::Pointer ptrI0W1 = new VectorImageType( plddmm->GetSourceImage( 1.0 ) );
   // generating warped image
-  VectorImageUtilsType::writeFileITK( ptrI0W1, resultImage );
+  VectorImageUtilsType::writeImageITK( ptrI0W1, resultImage );
 
   return EXIT_SUCCESS;
 }

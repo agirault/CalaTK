@@ -59,8 +59,8 @@ int DoIt( int argc, char* argv[] )
   typename RegistrationType::Pointer lddmm = new RegistrationType;
 
   // if registered externally, those images get automatically deallocated by the image manager
-  typename VectorImageType::Pointer pIm0 = VectorImageUtilsType::readFileITK( sourceImage );
-  typename VectorImageType::Pointer pIm1 = VectorImageUtilsType::readFileITK( targetImage );
+  typename VectorImageType::Pointer pIm0 = VectorImageUtilsType::readImageITK( sourceImage );
+  typename VectorImageType::Pointer pIm1 = VectorImageUtilsType::readImageITK( targetImage );
 
   // now artificially change the spacing
   pIm0->SetSpacingX( spacingFactor*pIm0->GetSpacingX() );
@@ -100,13 +100,13 @@ int DoIt( int argc, char* argv[] )
   // create warped source image
 
   typename VectorFieldType::ConstPointer ptrMap1 = new VectorFieldType( lddmm->GetMap( 1.0 ) );
-  VectorImageUtilsType::writeFileITK( ptrMap1, sourceToTargetMap );
+  VectorImageUtilsType::writeMapITK( ptrMap1, sourceToTargetMap, false );
 
   typename VectorImageType::ConstPointer ptrI0Orig = ptrImageManager->GetOriginalImageById( uiI0 );
   typename VectorImageType::Pointer ptrI0W1 = new VectorImageType( ptrI0Orig );
 
   LDDMMUtilsType::applyMap( ptrMap1, ptrI0Orig, ptrI0W1 );
-  VectorImageUtilsType::writeFileITK( ptrI0W1, warpedSourceImage );
+  VectorImageUtilsType::writeImageITK( ptrI0W1, warpedSourceImage );
 
   return EXIT_SUCCESS;
 }

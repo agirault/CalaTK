@@ -67,7 +67,7 @@ int calatkAdvectionTest( int argc, char* argv[] )
 
   // load the input image
 
-  VectorImageType::Pointer pIm = VectorImageUtilsType::readFileITK( argv[1] );
+  VectorImageType::Pointer pIm = VectorImageUtilsType::readImageITK( argv[1] );
 
   // create a vector field of the same dimension and initialize it
   // with the given velocities in the x and the y directions
@@ -94,7 +94,7 @@ int calatkAdvectionTest( int argc, char* argv[] )
 
   evolver.SolveForward( pV, pIm, pImOut, pImTmp, dTime );
   
-  VectorImageUtilsType::writeFileITK( pImOut, argv[2] );
+  VectorImageUtilsType::writeImageITK( pImOut, argv[2] );
 
   return EXIT_SUCCESS;
 

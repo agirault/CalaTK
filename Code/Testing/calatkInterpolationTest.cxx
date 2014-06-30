@@ -55,10 +55,10 @@ int calatkInterpolationTest( int argc, char* argv[] )
 
   // load the input image
 
-  VectorImageType::Pointer pIm = VectorImageUtilsType::readFileITK( argv[1] );
+  VectorImageType::Pointer pIm = VectorImageUtilsType::readImageITK( argv[1] );
 
   // load the map
-  VectorImageType* ptrMapInVecIm = VectorImageUtilsType::readFileITK( argv[2] );
+  VectorImageType* ptrMapInVecIm = VectorImageUtilsType::readImageITK( argv[2] );
   const VectorFieldType::Pointer pV = static_cast< VectorFieldType* >( ptrMapInVecIm );
 
   // get memory for the output image and for the temporary image
@@ -71,8 +71,8 @@ int calatkInterpolationTest( int argc, char* argv[] )
   interpolator.InterpolateNegativeVelocityPos( pIm, pV, dt, pImOutLinear );
   interpolatorCubic.InterpolateNegativeVelocityPos( pIm, pV, dt, pImOutCubic );
 
-  VectorImageUtilsType::writeFileITK( pImOutLinear, argv[3] );
-  VectorImageUtilsType::writeFileITK( pImOutCubic, argv[4] );
+  VectorImageUtilsType::writeImageITK( pImOutLinear, argv[3] );
+  VectorImageUtilsType::writeImageITK( pImOutCubic, argv[4] );
 
   return EXIT_SUCCESS;
 }

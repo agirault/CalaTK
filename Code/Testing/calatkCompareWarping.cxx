@@ -54,7 +54,7 @@ int Warping< TFloat, VImageDimension >::ReadJSONContent( const Json::Value & bas
                 {
                     std::string fileName=(*baselineIt).asString();
                     typename VectorImage< TFloat, VImageDimension >::Pointer map;
-                    map=DisplacementVectorType::readFileITK(fileName);
+                    map=DisplacementVectorType::readMapITK(fileName, false);
                     displacementVectornumber++;
                 }
             }
