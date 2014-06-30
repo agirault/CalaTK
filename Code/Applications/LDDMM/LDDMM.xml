@@ -4,10 +4,10 @@
   <category>Registration</category>
     <title>LDDMM Image-to-Image Registration</title>
     <description>An implementation of LDDMM</description>
-    <version>1.0</version>
+    <version>2.0</version>
     <documentation-url></documentation-url>
     <license>Apache 2.0</license>
-    <contributor>test</contributor>
+    <contributor>The CALATK team</contributor>
     <acknowledgements></acknowledgements>
 
   <parameters>
