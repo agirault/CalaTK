@@ -30,6 +30,10 @@
 		"OutputStateInformationFrequency" : 100
 	},
 	"MultiScaleSigmaInVoxels" : 0.50,
+	"MultiScaleGeneralSettings" :
+	{
+		"SingleScaleSolver" : "LineSearchUnconstrained"
+	},
 	"MultiScaleSettings" :
 	[
 
