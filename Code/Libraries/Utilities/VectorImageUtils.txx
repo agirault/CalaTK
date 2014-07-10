@@ -3271,7 +3271,7 @@ bool VectorImageUtils< T, VImageDimension >::writeTimeDependantImagesITK( const 
 }
 
 //
-// readFileITK
+// readMapITK
 //
 template <class T, unsigned int VImageDimension >
 typename VectorImageUtils< T, VImageDimension >::VectorImageType*
@@ -3293,7 +3293,7 @@ VectorImageUtils< T, VImageDimension >::readMapITK(const std::string& filename, 
     }
   catch( itk::ExceptionObject & err )
     {
-    throw std::runtime_error( "VectorImageUtils< T, VImageDimension >::readFileITK -> Reading Failed" );
+    throw std::runtime_error( "VectorImageUtils< T, VImageDimension >::readMapITK -> Reading Failed" );
     return NULL;
     }
 
@@ -3306,6 +3306,9 @@ VectorImageUtils< T, VImageDimension >::readMapITK(const std::string& filename, 
   return VectorImageUtils< T, VImageDimension >::convertFromITK(itkImage);
 }
 
+//
+// readImageITK
+//
 template <class T, unsigned int VImageDimension >
 typename VectorImageUtils< T, VImageDimension >::VectorImageType*
 VectorImageUtils< T, VImageDimension >::readImageITK(const std::string& filename)
@@ -3327,7 +3330,7 @@ VectorImageUtils< T, VImageDimension >::readImageITK(const std::string& filename
     }
   catch( itk::ExceptionObject & err )
     {
-    throw std::runtime_error( "VectorImageUtils< T, VImageDimension >::readFileITK -> Reading Failed" );
+    throw std::runtime_error( "VectorImageUtils< T, VImageDimension >::readImageITK -> Reading Failed" );
     return NULL;
     }
 
