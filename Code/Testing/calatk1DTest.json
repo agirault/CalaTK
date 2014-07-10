@@ -29,6 +29,10 @@
 		"OutputStateInformation" : false,
 		"OutputStateInformationFrequency" : 100
 	},
+	"MultiScaleGeneralSettings" :
+	{
+		"SingleScaleSolver" : "LineSearchUnconstrained"
+	},
 	"MultiScaleSettings" :
 	[
 
