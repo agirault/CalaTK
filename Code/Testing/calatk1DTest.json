@@ -55,6 +55,10 @@
 				"OutputStateInformation" : false,
 				"OutputStateInformationFrequency" : 100,
 				"ReductionFactor" : 0.50
+
+				//Parameters for StepLengthSelection
+ 				"MinDisplacementAllowed" : 0.005,
+ 				"MinGradAllowed" : 1.0,
 			}
 		},
 
@@ -77,6 +81,10 @@
 				"OutputStateInformation" : false,
 				"OutputStateInformationFrequency" : 100,
 				"ReductionFactor" : 0.50
+
+				//Parameters for StepLengthSelection
+ 				"MinDisplacementAllowed" : 0.005,
+ 				"MinGradAllowed" : 1.0,
 			}
 		},
 
@@ -99,6 +107,10 @@
 				"OutputStateInformation" : false,
 				"OutputStateInformationFrequency" : 100,
 				"ReductionFactor" : 0.50
+
+				//Parameters for StepLengthSelection
+ 				"MinDisplacementAllowed" : 0.005,
+ 				"MinGradAllowed" : 1.0,
 			}
 		}
 	],
